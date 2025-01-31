@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CoffeeDocs
+namespace CoffeeLogger
 {
     public class GrindDial
     {

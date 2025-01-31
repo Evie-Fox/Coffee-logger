@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Data;
 using System.Data.SQLite;
+using CoffeeDocs;
+using System.Xml.Linq;
 
 
 namespace CoffeeLogger
 {
-    public class Main
+    public class Program
     {
         public SQLController db;
 
-        public MainWindow()
+        public Program()
         {
             db = new SQLController();
             db.Activate();
@@ -26,15 +27,15 @@ namespace CoffeeLogger
         }
 
 
-        private void ClearDB(object sender, MouseButtonEventArgs e)
+        private void ClearDB()
         {
             Console.WriteLine("CLEAR DB");
             db.ClearDB();
         }
 
-        private void AddNewGrinder(object sender, MouseButtonEventArgs e)
+        private void AddNewGrinder(string name)
         {
-            string grinderName = textBox.Text.Trim();
+            string grinderName = name;
             string[] grinderNamesOnDB = db.GetGrinderNames();
 
             if (grinderNamesOnDB.Contains(grinderName))
@@ -47,9 +48,9 @@ namespace CoffeeLogger
             Console.WriteLine($"Grinders on DB: {string.Join(", ", db.GetGrinderNames())}");
         }
 
-        private void AddNewBrewer(object sender, MouseButtonEventArgs e)
+        private void AddNewBrewer(string name)
         {
-            string brewerName = textBox.Text.Trim();
+            string brewerName = name;
             string[] brewerNames = db.GetBrewerNames();
 
             if (brewerNames.Contains(brewerName))
@@ -61,9 +62,9 @@ namespace CoffeeLogger
             db.AddBrewer(brewerName);
         }
 
-        private void AddNewCoffee(object sender, MouseButtonEventArgs e)//Nothing here
+        private void AddNewCoffee(string name)//Nothing here
         {
-            string coffeeBeanName = textBox.Text.Trim();
+            string coffeeBeanName = name;
             string[] coffeeNames = db.GetCoffeeNames();
 
             if (coffeeNames.Contains(coffeeBeanName))
