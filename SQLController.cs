@@ -234,34 +234,23 @@ namespace CoffeeLogger
                 }
             }
         }
-        public void AddBean(string beanName, RoastLevel roast)//this it not it
+        public void AddBean(string beanName, string? rosterName, string? origin,RoastLevel roast = RoastLevel.None)//this it not it
         {
             using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
             {
                 db.Open();
 
-                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO CoffeeBeans (Name, RoastLevelEnum) VALUES (@name, @roast)", db))
+                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO CoffeeBeans (Name, RoasterName, Origin, RoastLevelEnum) VALUES (@name, @roasterName, @origin,@roast)", db))
                 {
 
                     com.Parameters.AddWithValue("@name", beanName);
+                    com.Parameters.AddWithValue("@roasterName", rosterName);
+                    com.Parameters.AddWithValue("@origin", origin);
                     com.Parameters.AddWithValue("@roast", (int)roast);
                     com.ExecuteNonQuery();
                 }
             }
         }
-        public enum RoastLevel
-        {
-            None = 0,
-            Light = 1,
-            Medium = 2,
-            Dark = 3
-        }
-        public enum BrewMethod
-        {
-            None = 0,
-            Percolation = 1,
-            Infusion = 2,
-            SteepAndRelease = 3
-        }
+        
     }
 }

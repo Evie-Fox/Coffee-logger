@@ -23,6 +23,7 @@ namespace CoffeeLogger
             db = new SQLController();
             db.Activate();
             ConsoleReader();
+            Console.WriteLine("\n\nShutting down");
         }
 
         private async Task ConsoleReader()
@@ -40,14 +41,27 @@ namespace CoffeeLogger
 
                 switch (input)
                 {
+                    case "cleardb":
+                        ClearDB(); 
+                        break;
+
                     case "newgrinder":
                         await AddNewGrinderFromConsole();
                         break;
                     case "grinders":
                         Console.WriteLine("\n\n" + String.Join("\n", db.GetGrinderNames()) + "\n");
                         break;
-                    case "cleardb":
-                        ClearDB(); 
+
+                    case "newbrewer":
+                        break;
+                    case "brewers":
+                        Console.WriteLine("\n\n" + String.Join("\n", db.GetBrewerNames()) + "\n");
+                        break;
+
+                    case "newcoffee" or "newbeans" or "newcoffeebeans":
+                        break;
+                    case "coffee" or "beans" or "coffeebeans":
+                        Console.WriteLine("\n\n" + String.Join("\n", db.GetCoffeeNames()) + "\n");
                         break;
 
                     case "stop" or "quit":
@@ -55,7 +69,7 @@ namespace CoffeeLogger
 
                     default:
                     case null or "":
-                        Console.WriteLine("Invalid command");
+                        Console.WriteLine("\nInvalid command");
                         break;
                 }
             }
@@ -67,7 +81,7 @@ namespace CoffeeLogger
             db.ClearDB();
         }
 
-        private async Task<string?> ReadWithEsc()
+        public static async Task<string?> ReadWithEsc()
         {
             StringBuilder input = new StringBuilder();
 
@@ -167,7 +181,6 @@ namespace CoffeeLogger
             Console.WriteLine($"\n\nGrinders on DB: {string.Join(", ", db.GetGrinderNames())}");
             return true;
         }
-
         private bool GrinderNameIsTaken(string name)
         {
             string[] grinderNamesOnDB = db.GetGrinderNames();
@@ -176,7 +189,12 @@ namespace CoffeeLogger
 
         private void AddNewBrewer(string name)
         {
-            string brewerName = name;
+            BrewerNameIsTaken(name);
+            db.AddBrewer(name);
+        }
+
+        private void BrewerNameIsTaken(string brewerName)
+        {
             string[] brewerNames = db.GetBrewerNames();
 
             if (brewerNames.Contains(brewerName))
@@ -184,21 +202,36 @@ namespace CoffeeLogger
                 Console.WriteLine("Brewer name is taken on the DB");
                 return;
             }
-
-            db.AddBrewer(brewerName);
         }
 
-        private void AddNewCoffee(string name)//Nothing here
+        private void AddNewCoffee(string name, string? roasterName = null, string? origin = null, RoastLevel roast = RoastLevel.None)//Nothing here
         {
-            string coffeeBeanName = name;
-            string[] coffeeNames = db.GetCoffeeNames();
+            CoffeeNameIsTaken(name);
+            db.AddBean(name, roasterName, origin, RoastLevel.None);
+        }
 
+        private void CoffeeNameIsTaken(string coffeeBeanName)
+        {
+            string[] coffeeNames = db.GetCoffeeNames();
             if (coffeeNames.Contains(coffeeBeanName))
             {
                 Console.WriteLine("Coffee bean name is taken on the DB");
                 return;
             }
-            db.AddBean(coffeeBeanName, SQLController.RoastLevel.None);
         }
+    }
+    public enum RoastLevel
+    {
+        None = 0,
+        Light = 1,
+        Medium = 2,
+        Dark = 3
+    }
+    public enum BrewMethod
+    {
+        None = 0,
+        Percolation = 1,
+        Infusion = 2,
+        SteepAndRelease = 3
     }
 }
