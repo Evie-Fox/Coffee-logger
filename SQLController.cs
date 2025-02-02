@@ -4,20 +4,21 @@ namespace CoffeeLogger
 {
     public class SQLController
     {
-        private string path = @"..\..\DB\MainDB.db";
+        private string _pathToDir = @"..\..\..\DB\";
+        private string _pathToFile = @"..\..\..\DB\MainDB.db";
         private SQLiteConnection db;
 
         public void Activate()
         {
-            path = Path.GetFullPath(path);
-            if (!File.Exists(path))
+            _pathToFile = Path.GetFullPath(_pathToFile);
+            if (!File.Exists(_pathToFile))
             {
                 Console.WriteLine("DB not found\nCreating new DB");
-                CreateDB(path);
+                CreateDB(_pathToFile);
             }
             else
             {
-                db = new SQLiteConnection($"Data Source = {path}; Version = 3;");
+                db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;");
             }
 
             //use it
@@ -41,7 +42,7 @@ namespace CoffeeLogger
 
         public void CreateDB(string path)
         {
-            Directory.CreateDirectory(Path.GetFullPath(@"..\..\DB"));
+            Directory.CreateDirectory(Path.GetFullPath(_pathToDir));
             SQLiteConnection.CreateFile(path);
 
             using (db = new SQLiteConnection($"Data Source = {path}; Version = 3;"))
@@ -71,7 +72,8 @@ namespace CoffeeLogger
 
                 SQLiteCommand GrinderTable = new SQLiteCommand(@"
             CREATE TABLE Grinders(
-            Name VARCHAR(255) PRIMARY KEY
+            Name VARCHAR(255) PRIMARY KEY,
+            DialFormat VARCHAR(255) NOT NULL
             )", db);
 
                 GrinderTable.ExecuteNonQuery();
@@ -80,7 +82,7 @@ namespace CoffeeLogger
             CREATE TABLE GrindSettings(
             GrinderName VARCHAR(255) NOT NULL,
             GrindSetting INT NOT NULL,
-            PRIMARY KEY ( GrinderName, GrindSetting)
+            PRIMARY KEY (GrinderName, GrindSetting)
             FOREIGN KEY (GrinderName) REFERENCES Grinders(Name)
             )", db);
 
@@ -119,7 +121,7 @@ namespace CoffeeLogger
         public void ClearDB()
         {
 
-            using (db = new SQLiteConnection($"Data Source = {path}; Version = 3;"))
+            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
             {
                 db.Open();
                 SQLiteCommand com = new SQLiteCommand(@" SELECT name FROM sqlite_master WHERE type='table'", db);
@@ -139,7 +141,7 @@ namespace CoffeeLogger
 
         public string[] GetGrinderNames()
         {
-            using (db = new SQLiteConnection($"Data Source = {path}; Version = 3;"))
+            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
             {
                 db.Open();
                 SQLiteCommand com = new SQLiteCommand(@"
@@ -148,7 +150,7 @@ namespace CoffeeLogger
                 FROM Grinders
 
                 ", db);
-                SQLiteDataReader data = com.ExecuteReader();
+                SQLiteDataReader data = com.ExecuteReader(); //<here it crushes
                 List<string> names = new List<string>();
                 while (data.Read())
                 {
@@ -161,7 +163,7 @@ namespace CoffeeLogger
 
         public string[] GetBrewerNames()
         {
-            using (db = new SQLiteConnection($"Data Source = {path}; Version = 3;"))
+            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
             {
                 db.Open();
                 SQLiteCommand com = new SQLiteCommand(@"
@@ -182,7 +184,7 @@ namespace CoffeeLogger
 
         public string[] GetCoffeeNames()
         {
-            using (db = new SQLiteConnection($"Data Source = {path}; Version = 3;"))
+            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
             {
                 db.Open();
                 SQLiteCommand com = new SQLiteCommand(@"
@@ -201,16 +203,17 @@ namespace CoffeeLogger
             }
         }
 
-        public void AddGrinder(string grinderName)
+        public void AddGrinder(string grinderName, string format)
         {
-            using (db = new SQLiteConnection($"Data Source = {path}; Version = 3;"))
+            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
             {
                 db.Open();
 
-                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO Grinders (Name) VALUES (@name)", db))
+                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO Grinders (Name, DialFormat) VALUES (@name, @format)", db))
                 {
 
                     com.Parameters.AddWithValue("@name", grinderName);
+                    com.Parameters.AddWithValue("@format", format);
                     com.ExecuteNonQuery();
                 }
             }
@@ -218,7 +221,7 @@ namespace CoffeeLogger
 
         public void AddBrewer(string brewerName, BrewMethod brewMethod = BrewMethod.None)
         {
-            using (db = new SQLiteConnection($"Data Source = {path}; Version = 3;"))
+            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
             {
                 db.Open();
 
@@ -233,7 +236,7 @@ namespace CoffeeLogger
         }
         public void AddBean(string beanName, RoastLevel roast)//this it not it
         {
-            using (db = new SQLiteConnection($"Data Source = {path}; Version = 3;"))
+            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
             {
                 db.Open();
 
