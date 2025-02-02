@@ -8,6 +8,8 @@ namespace CoffeeLogger
 
         public static Program instance;
 
+        private GrinderManager gm;
+
         private static void Main()
         {
             instance = new Program();
@@ -22,6 +24,9 @@ namespace CoffeeLogger
         {
             db = new SQLController();
             db.Activate();
+
+            gm = new GrinderManager(db);
+
             ConsoleReader();
             Console.WriteLine("\n\nShutting down");
         }
@@ -46,7 +51,7 @@ namespace CoffeeLogger
                         break;
 
                     case "newgrinder":
-                        await AddNewGrinderFromConsole();
+                        await gm.AddNewGrinderFromConsole();
                         break;
                     case "grinders":
                         Console.WriteLine("\n\n" + String.Join("\n", db.GetGrinderNames()) + "\n");
@@ -116,107 +121,6 @@ namespace CoffeeLogger
 
                     
                 }
-            }
-        }
-
-
-        private async Task AddNewGrinderFromConsole()
-        {
-            while (true) //allows to return to entering a name
-            {
-                string? name, format;
-                while (true)
-                {
-                    Console.Write("\nEnter grinder name:\n>");
-                    name = await ReadWithEsc();
-                    if (string.IsNullOrWhiteSpace(name))
-                    {
-                        return;
-                    }
-                    name = name.Trim();
-                    if (!name.All(x => char.IsAsciiLetter(x) || x == ' ' || x == '(' || x ==')'))
-                    {
-                        Console.WriteLine("Invalid name\n");
-                        continue;
-                    }
-                    if (GrinderNameIsTaken(name))
-                    {
-                        Console.WriteLine("\n\nGrinder name is taken on the DB\n");
-                        continue;
-                    }
-                    break;
-
-                }
-                Console.WriteLine("\n\nEnter dial format:\nExample: 4,5,9  \n\nExplanation: \n4 is the highest possible rotation,\n5 is the highest large mark before a full rotation, as on a full rotation it returns to 0\n9 is the highest small mark, as when instead of going to 10 it returns to 0 and adds 1 to the larger mark\n\n");
-                while (true)
-                {
-                    Console.Write('>');
-                    format = await ReadWithEsc();
-                    if (string.IsNullOrWhiteSpace(format))
-                    {
-                        break;
-                    }
-                    if (!format.All(x => char.IsDigit(x) || x ==','))
-                    {
-                        Console.WriteLine("\n\nInvalid format\n\nEnter dial format:\n");
-                        continue;
-                    }
-                    AddNewGrinder(name, format);
-                    return;
-                }
-
-            }
-        }
-
-        private bool AddNewGrinder(string name, string format)
-        {
-
-            if (GrinderNameIsTaken(name))
-            {
-                Console.WriteLine("\n\nGrinder name is taken on the DB\n");
-                return false;
-            }
-
-            db.AddGrinder(name, format);
-            Console.WriteLine($"\n\nGrinders on DB: {string.Join(", ", db.GetGrinderNames())}");
-            return true;
-        }
-        private bool GrinderNameIsTaken(string name)
-        {
-            string[] grinderNamesOnDB = db.GetGrinderNames();
-            return grinderNamesOnDB.Contains(name);
-        }
-
-        private void AddNewBrewer(string name)
-        {
-            BrewerNameIsTaken(name);
-            db.AddBrewer(name);
-        }
-
-        private void BrewerNameIsTaken(string brewerName)
-        {
-            string[] brewerNames = db.GetBrewerNames();
-
-            if (brewerNames.Contains(brewerName))
-            {
-                Console.WriteLine("Brewer name is taken on the DB");
-                return;
-            }
-        }
-
-        private void AddNewCoffee(string name, string? roasterName = null, string? origin = null, RoastLevel roast = RoastLevel.None)//Nothing here
-        {
-            CoffeeNameIsTaken(name);
-            db.AddBean(name, roasterName, origin, RoastLevel.None);
-        }
-
-        private void CoffeeNameIsTaken(string coffeeBeanName)
-        {
-            string[] coffeeNames = db.GetCoffeeNames();
-            if (coffeeNames.Contains(coffeeBeanName))
-            {
-                Console.WriteLine("Coffee bean name is taken on the DB");
-                return;
             }
         }
     }
