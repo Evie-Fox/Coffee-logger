@@ -4,10 +4,10 @@ namespace CoffeeLogger
 {
     public class GrindDial
     {
-        private byte z, zMax;
-        private byte y, yMax;
-        private byte x, xMax;
-        public GrindDial(byte zMax, byte xMax, byte yMax) 
+        private int z, zMax;
+        private int y, yMax;
+        private int x, xMax;
+        public GrindDial(int zMax, int xMax, int yMax) 
         {
             this.zMax = zMax;
             this.xMax = xMax;
@@ -15,6 +15,28 @@ namespace CoffeeLogger
             z = 0;
             x = 0;
             y = 0;
+        }
+        public GrindDial(string maxes)
+        {
+            maxes = maxes.Trim().Replace(" ", string.Empty);
+            if (string.IsNullOrWhiteSpace(maxes) || !maxes.All(c => char.IsAsciiDigit(c) || c == ','))
+            {
+                throw new ArgumentException("Invalid dial format");
+            }
+            int[] maxVals = Array.ConvertAll(maxes.Split(','), int.Parse);
+            int length = maxVals.Length - 1;
+
+            if (length > 2)
+            {
+                Console.WriteLine("Dial format too long, using only first 3 vals");
+                length = 2;
+            }
+            xMax = maxVals[length--];
+            if (length < 0) { return; }
+            yMax = maxVals[length--];
+            if (length < 0) { return; }
+            zMax = maxVals[length];
+            return;
         }
         public int ZUp()
         {

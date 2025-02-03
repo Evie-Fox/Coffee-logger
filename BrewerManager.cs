@@ -2,6 +2,12 @@
 {
     public class BrewerManager
     {
+        private SQLController db;
+        public BrewerManager(SQLController dbRef) 
+        {
+            db = dbRef;
+        }
+
 
         private void AddNewBrewer(string name)
         {

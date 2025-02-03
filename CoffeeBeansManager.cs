@@ -2,6 +2,12 @@
 {
     public class CoffeeBeansManager
     {
+        private SQLController db;
+        public CoffeeBeansManager(SQLController dbRef) 
+        {
+            db = dbRef;
+        }
+
 
         private void AddNewCoffee(string name, string? roasterName = null, string? origin = null, RoastLevel roast = RoastLevel.None)//Nothing here
         {
