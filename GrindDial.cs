@@ -7,7 +7,8 @@ namespace CoffeeLogger
         private int z, zMax;
         private int y, yMax;
         private int x, xMax;
-        public GrindDial(int zMax, int xMax, int yMax) 
+
+        public GrindDial(int zMax, int xMax, int yMax)
         {
             this.zMax = zMax;
             this.xMax = xMax;
@@ -16,6 +17,7 @@ namespace CoffeeLogger
             x = 0;
             y = 0;
         }
+
         public GrindDial(string maxes)
         {
             maxes = maxes.Trim().Replace(" ", string.Empty);
@@ -28,7 +30,7 @@ namespace CoffeeLogger
 
             if (length > 2)
             {
-                Console.WriteLine("Dial format too long, using only first 3 vals");
+                Console.WriteLine("\nDial format too long, using only first 3 values");
                 length = 2;
             }
             xMax = maxVals[length--];
@@ -38,6 +40,7 @@ namespace CoffeeLogger
             zMax = maxVals[length];
             return;
         }
+
         public int ZUp()
         {
             z++;
@@ -47,6 +50,7 @@ namespace CoffeeLogger
             }
             return z;
         }
+
         public int ZDown()
         {
             if (z == 0)
@@ -59,6 +63,7 @@ namespace CoffeeLogger
             }
             return z;
         }
+
         public int yUp()
         {
             y++;
@@ -68,6 +73,7 @@ namespace CoffeeLogger
             }
             return y;
         }
+
         public int YDown()
         {
             if (y == 0)
@@ -80,6 +86,7 @@ namespace CoffeeLogger
             }
             return y;
         }
+
         public int XUp()
         {
             x++;
@@ -89,21 +96,37 @@ namespace CoffeeLogger
             }
             return x;
         }
+
         public int XDown()
         {
             if (x == 0)
             {
                 x = xMax;
             }
-            else 
+            else
             {
                 x--;
             }
             return x;
         }
+
         public int Result()
         {
             return z * 100 + y * 10 + x;
+        }
+
+        public string GetDialFormat()
+        {
+            string val = x.ToString();
+            if (yMax != 0)
+            {
+                val = $"{yMax},{xMax}";
+                if (zMax != 0)
+                {
+                    val = $"{zMax},{yMax},{xMax}";
+                }
+            }
+            return val;
         }
     }
 }

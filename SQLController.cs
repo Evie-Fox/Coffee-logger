@@ -160,6 +160,32 @@ namespace CoffeeLogger
             }
         }
         
+        public string GetGrinderDialFormat(string grinderName)
+        {
+            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
+            {
+                db.Open();
+                SQLiteCommand com = new SQLiteCommand(@$"
+                
+                SELECT DialFormat
+                FROM Grinders
+                WHERE Name = @grinderName
+                
+                ", db);
+                
+                com.Parameters.AddWithValue("@grinderName", grinderName);
+
+                SQLiteDataReader data = com.ExecuteReader();
+                string result = string.Empty;
+                while (data.Read())
+                {
+                    result = data["DialFormat"].ToString();
+                }
+                return result;
+
+            }
+        }
+        
 
         public string[] GetBrewerNames()
         {

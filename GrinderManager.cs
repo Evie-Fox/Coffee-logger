@@ -66,7 +66,11 @@ namespace CoffeeLogger
                         Console.WriteLine("\n\nInvalid format\n\nEnter dial format:\n");
                         continue;
                     }
+                    format = new GrindDial(format).GetDialFormat();
                     AddNewGrinder(name, format);
+
+                    Console.WriteLine(GetGrinderDialFormat(name) + " is the format!");
+                    /////////
                     return;
                 }
 
@@ -76,6 +80,15 @@ namespace CoffeeLogger
         {
             string[] grinderNamesOnDB = db.GetGrinderNames();
             return grinderNamesOnDB.Contains(name);
+        }
+        public string GetGrinderDialFormat(string grinderName)
+        {
+            if (!GrinderNameIsTaken(grinderName))
+            {
+                Console.WriteLine("Grinder doesn't exist");
+                return null;
+            }
+            return db.GetGrinderDialFormat(grinderName);
         }
     }
 }
