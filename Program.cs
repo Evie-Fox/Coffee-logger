@@ -9,6 +9,7 @@ namespace CoffeeLogger
         public static Program instance;
 
         private GrinderManager gm;
+        private GrinderSettingManager gsm;
 
         private static void Main()
         {
@@ -26,6 +27,7 @@ namespace CoffeeLogger
             db.Activate();
 
             gm = new GrinderManager(db);
+            gsm = new GrinderSettingManager(db, gm);
 
             ConsoleReader();
             Console.WriteLine("\n\nShutting down");
@@ -50,20 +52,24 @@ namespace CoffeeLogger
                         ClearDB(); 
                         break;
 
-                    case "newgrinder":
+                    case "newgrinder" or "addgrinder":
                         await gm.AddNewGrinderFromConsole();
                         break;
                     case "grinders":
                         Console.WriteLine("\n\n" + String.Join("\n", db.GetGrinderNames()) + "\n");
                         break;
 
-                    case "newbrewer":
+                    case "newgrind":
+                        await gsm.AddNewGrindSetting();
+                        break;
+
+                    case "newbrewer" or "addbrewer":
                         break;
                     case "brewers":
                         Console.WriteLine("\n\n" + String.Join("\n", db.GetBrewerNames()) + "\n");
                         break;
 
-                    case "newcoffee" or "newbeans" or "newcoffeebeans":
+                    case "newcoffee" or "newbeans" or "newcoffeebeans" or "addcoffee" or "addbeans":
                         break;
                     case "coffee" or "beans" or "coffeebeans":
                         Console.WriteLine("\n\n" + String.Join("\n", db.GetCoffeeNames()) + "\n");

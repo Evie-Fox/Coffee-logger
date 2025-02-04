@@ -76,7 +76,7 @@ namespace CoffeeLogger
             }
         }
 
-        private bool IsGrinderRegistered(string name)
+        public bool IsGrinderRegistered(string name)
         {
             string[] grinderNamesOnDB = db.GetGrinderNames();
             return grinderNamesOnDB.Contains(name);
@@ -92,24 +92,60 @@ namespace CoffeeLogger
             return db.GetGrinderDialFormat(grinderName);
         }
 
-        public bool IsDialCompatible(string grinderName, GrindDial newDialSetting)
+        public bool IsSettingCompatible(string grinderName, GrindDial newSetting)
         {
             string format = GetGrinderDialFormatOrNull(grinderName);
 
             int[] formatNums = new GrindDial(format).GetDialFormatIntArr();
-            int[] dialNums = newDialSetting.GetDialFormatIntArr();
+            int[] settingNums = newSetting.GetDialFormatIntArr();
 
             int formatLength = formatNums.Length;
 
-            if (formatLength != dialNums.Length) 
+            if (formatLength != settingNums.Length) 
             { return false; }
 
             for (int i = 0; i < formatLength; i++)
             {
-                if (formatNums[i] < dialNums[i]) 
+                if (formatNums[i] < settingNums[i]) 
                 { return false; }
             }
             return true;
+        }
+
+        public async Task<string> ChooseGrinder()
+        {
+            string[] names = db.GetGrinderNames();
+            int namesLength = names.Length;
+
+            Console.WriteLine("Registered grinders:\n");
+
+            for (int i = 0; namesLength > i; i++)
+            {
+                Console.WriteLine($"{i + 1}. {names[i]}");
+            }
+            string? inputNum;
+            while (true)
+            {
+                Console.Write("\nEnter grinder's number:\n>");
+                inputNum = await Program.ReadWithEsc();
+                if (string.IsNullOrWhiteSpace(inputNum))
+                {
+                    return null;
+                }
+                inputNum = inputNum.Trim();
+                if (!inputNum.All(x => char.IsAsciiDigit(x)))
+                {
+                    Console.WriteLine("Invalid number\n");
+                    continue;
+                }
+                int num = int.Parse(inputNum);
+                if (num < 1 || num > namesLength + 1)
+                {
+                    Console.WriteLine("\n\nOutside of range\n");
+                    continue;
+                }
+                return names[num - 1];
+            }
         }
     }
 }
