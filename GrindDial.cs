@@ -45,22 +45,16 @@ namespace CoffeeLogger
         {
             z++;
             if (z > zMax)
-            {
-                z = 0;
-            }
+            { z = 0; }
             return z;
         }
 
         public int ZDown()
         {
             if (z == 0)
-            {
-                z = zMax;
-            }
+            { z = zMax; }
             else
-            {
-                z--;
-            }
+            { z--; }
             return z;
         }
 
@@ -68,22 +62,16 @@ namespace CoffeeLogger
         {
             y++;
             if (y > yMax)
-            {
-                y = 0;
-            }
+            { y = 0; }
             return y;
         }
 
         public int YDown()
         {
             if (y == 0)
-            {
-                y = yMax;
-            }
+            { y = yMax; }
             else
-            {
-                y--;
-            }
+            { y--; }
             return y;
         }
 
@@ -91,42 +79,30 @@ namespace CoffeeLogger
         {
             x++;
             if (x > xMax)
-            {
-                x = 0;
-            }
+            { x = 0; }
             return x;
         }
 
         public int XDown()
         {
             if (x == 0)
-            {
-                x = xMax;
-            }
+            { x = xMax; }
             else
-            {
-                x--;
-            }
+            { x--; }
             return x;
         }
 
-        public int Result()
+        public string GetDialFormatString()
         {
-            return z * 100 + y * 10 + x;
+            int[] all = { zMax, yMax, xMax };
+            all = all.Where(x => x > 0).ToArray();
+            return string.Join(",", all);
         }
-
-        public string GetDialFormat()
+        
+        public int[] GetDialFormatIntArr()
         {
-            string val = x.ToString();
-            if (yMax != 0)
-            {
-                val = $"{yMax},{xMax}";
-                if (zMax != 0)
-                {
-                    val = $"{zMax},{yMax},{xMax}";
-                }
-            }
-            return val;
+            int[] val = {zMax, yMax, xMax};
+            return val.Where(x => x > 0).ToArray();
         }
     }
 }

@@ -13,7 +13,7 @@ namespace CoffeeLogger
         private bool AddNewGrinder(string name, string format)
         {
 
-            if (GrinderNameIsTaken(name))
+            if (IsGrinderRegistered(name))
             {
                 Console.WriteLine("\n\nGrinder name is taken on the DB\n");
                 return false;
@@ -44,7 +44,7 @@ namespace CoffeeLogger
                         Console.WriteLine("Invalid name\n");
                         continue;
                     }
-                    if (GrinderNameIsTaken(name))
+                    if (IsGrinderRegistered(name))
                     {
                         Console.WriteLine("\n\nGrinder name is taken on the DB\n");
                         continue;
@@ -52,7 +52,7 @@ namespace CoffeeLogger
                     break;
 
                 }
-                Console.WriteLine("\n\nEnter dial format:\nExample: 4,5,9  \n\nExplanation: \n4 is the highest possible rotation,\n5 is the highest large mark before a full rotation, as on a full rotation it returns to 0\n9 is the highest small mark, as when instead of going to 10 it returns to 0 and adds 1 to the larger mark\n\n");
+                Console.WriteLine("\n\nEnter dial format:\nExample: 4,5,9  \n\nExplanation: \n4 is the highest possible rotation, it cannot go above it or below zero.\n5 is the highest large mark before a full rotation, as on a full rotation it returns to 0 and adds 1 to the rotation.\n9 is the highest small mark, as when instead of going to 10 it returns to 0 and adds 1 to the larger mark.\n\n");
                 while (true)
                 {
                     Console.Write('>');
@@ -66,29 +66,50 @@ namespace CoffeeLogger
                         Console.WriteLine("\n\nInvalid format\n\nEnter dial format:\n");
                         continue;
                     }
-                    format = new GrindDial(format).GetDialFormat();
+                    format = new GrindDial(format).GetDialFormatString();
+                    Console.WriteLine("NEW is: "+ format);
                     AddNewGrinder(name, format);
 
-                    Console.WriteLine(GetGrinderDialFormat(name) + " is the format!");
-                    /////////
                     return;
                 }
 
             }
         }
-        private bool GrinderNameIsTaken(string name)
+
+        private bool IsGrinderRegistered(string name)
         {
             string[] grinderNamesOnDB = db.GetGrinderNames();
             return grinderNamesOnDB.Contains(name);
         }
-        public string GetGrinderDialFormat(string grinderName)
+
+        public string GetGrinderDialFormatOrNull(string grinderName)
         {
-            if (!GrinderNameIsTaken(grinderName))
+            if (!IsGrinderRegistered(grinderName))
             {
                 Console.WriteLine("Grinder doesn't exist");
                 return null;
             }
             return db.GetGrinderDialFormat(grinderName);
+        }
+
+        public bool IsDialCompatible(string grinderName, GrindDial newDialSetting)
+        {
+            string format = GetGrinderDialFormatOrNull(grinderName);
+
+            int[] formatNums = new GrindDial(format).GetDialFormatIntArr();
+            int[] dialNums = newDialSetting.GetDialFormatIntArr();
+
+            int formatLength = formatNums.Length;
+
+            if (formatLength != dialNums.Length) 
+            { return false; }
+
+            for (int i = 0; i < formatLength; i++)
+            {
+                if (formatNums[i] < dialNums[i]) 
+                { return false; }
+            }
+            return true;
         }
     }
 }
