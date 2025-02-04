@@ -67,9 +67,7 @@ namespace CoffeeLogger
                         continue;
                     }
                     format = new GrindDial(format).GetDialFormatString();
-                    Console.WriteLine("NEW is: "+ format);
                     AddNewGrinder(name, format);
-
                     return;
                 }
 
@@ -96,12 +94,12 @@ namespace CoffeeLogger
         {
             string format = GetGrinderDialFormatOrNull(grinderName);
 
-            int[] formatNums = new GrindDial(format).GetDialFormatIntArr();
-            int[] settingNums = newSetting.GetDialFormatIntArr();
+            int?[] formatNums = new GrindDial(format).GetDialFormatIntArr();
+            int?[] settingNums = newSetting.GetDialFormatIntArr();
 
             int formatLength = formatNums.Length;
 
-            if (formatLength != settingNums.Length) 
+            if (formatLength != settingNums.Length || settingNums.All(x => x < 1)) 
             { return false; }
 
             for (int i = 0; i < formatLength; i++)
@@ -112,12 +110,17 @@ namespace CoffeeLogger
             return true;
         }
 
-        public async Task<string> ChooseGrinder()
+        public async Task<string?> ChooseGrinder()
         {
             string[] names = db.GetGrinderNames();
             int namesLength = names.Length;
 
-            Console.WriteLine("Registered grinders:\n");
+            if (namesLength == 0) 
+            {
+                Console.WriteLine("No grinder registered, Please add a grinder");
+                return null;
+            }
+            Console.WriteLine("\nRegistered grinders:\n");
 
             for (int i = 0; namesLength > i; i++)
             {

@@ -4,9 +4,9 @@ namespace CoffeeLogger
 {
     public class GrindDial
     {
-        private int z, zMax;
-        private int y, yMax;
-        private int x, xMax;
+        private int? z, zMax = null;
+        private int? y, yMax;
+        private int? x, xMax;
 
         public GrindDial(int zMax, int xMax, int yMax)
         {
@@ -40,7 +40,7 @@ namespace CoffeeLogger
             zMax = maxVals[length];
             return;
         }
-
+/*
         public int ZUp()
         {
             z++;
@@ -90,19 +90,19 @@ namespace CoffeeLogger
             else
             { x--; }
             return x;
-        }
+        }*/
 
         public string GetDialFormatString()
         {
-            int[] all = { zMax, yMax, xMax };
-            all = all.Where(x => x > 0).ToArray();
+            int?[] all = { zMax, yMax, xMax };
+            all = all.Where(x => x != null).ToArray();
             return string.Join(",", all);
         }
         
-        public int[] GetDialFormatIntArr()
+        public int?[] GetDialFormatIntArr()
         {
-            int[] val = {zMax, yMax, xMax};
-            return val.Where(x => x > 0).ToArray();
+            int?[] val = {zMax, yMax, xMax};
+            return val.Where(x => x != null).ToArray();
         }
     }
 }

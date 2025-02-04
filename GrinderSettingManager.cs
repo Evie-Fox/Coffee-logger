@@ -14,9 +14,7 @@ namespace CoffeeLogger
 
         public async Task AddNewGrindSetting()
         {
-
-
-            while (true) //allows to return to entering a name
+            while (true)
             {
                 string? grinderName;
 
@@ -28,17 +26,27 @@ namespace CoffeeLogger
                 string grinderFormat = gm.GetGrinderDialFormatOrNull(grinderName);
                 if (grinderFormat == null)
                 {
-                    Console.WriteLine("Something went wrong, grinder doesn't have a format.");
+                    Console.WriteLine("\nSomething went wrong, grinder doesn't have a format.\n");
+                    return;
                 }
 
                 Console.WriteLine($"\nChose {grinderName} with the format of: {grinderFormat}");
 
                 Console.WriteLine("\n\nEnter dial setting:\nExample: 4,5,9  \n\nExplanation: \n4 is the highest possible rotation, it cannot go above it or below zero.\n5 is the highest large mark before a full rotation, as on a full rotation it returns to 0 and adds 1 to the rotation.\n9 is the highest small mark, as when instead of going to 10 it returns to 0 and adds 1 to the larger mark.\n");
-                string? newSetting = await ChooseGrindSetting(grinderName);
-                if (newSetting == null) 
-                {  return; }
-                Console.WriteLine($"\n {newSetting} is compatible with {grinderName}.\n");
-                return;
+                while (true)
+                {
+                    string? newSetting = await ChooseGrindSetting(grinderName);
+                    if (newSetting == null)
+                    { return; }
+                    if (db.IsGrindSettingTaken(grinderName, newSetting))
+                    {
+                        Console.WriteLine("\nGrind setting already exists\n");
+                        continue;
+                    }
+                    Console.WriteLine($"\n {newSetting} is compatible with {grinderName}.\n");
+                    db.AddGrindSetting(grinderName, newSetting);
+                    return;
+                }
             }
         }
 

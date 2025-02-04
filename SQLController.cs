@@ -81,9 +81,9 @@ namespace CoffeeLogger
                 SQLiteCommand GrindSettingsTable = new SQLiteCommand(@"
             CREATE TABLE GrindSettings(
             GrinderName VARCHAR(255) NOT NULL,
-            GrindSetting INT NOT NULL,
+            GrindSetting VARCHAR(255) NOT NULL,
             PRIMARY KEY (GrinderName, GrindSetting)
-            FOREIGN KEY (GrinderName) REFERENCES Grinders(Name)
+            FOREIGN KEY (GrinderName) REFERENCES Grinders(Name) ON DELETE CASCADE
             )", db);
 
                 GrindSettingsTable.ExecuteNonQuery();
@@ -93,7 +93,7 @@ namespace CoffeeLogger
             BrewID INTEGER PRIMARY KEY,
             CoffeeBeanID INT NOT NULL,
             BrewerID INT NOT NULL,
-            GrindSetting INT NOT NULL,
+            GrindSetting VARCHAR(255) NOT NULL,
             GrinderName VARCHAR(255) NOT NULL,
             GramsPerLiter INT NOT NULL,
             UNIQUE (CoffeeBeanID, BrewerID, GrinderName, GrindSetting)
@@ -185,7 +185,7 @@ namespace CoffeeLogger
 
             }
         }
-        
+
 
         public string[] GetBrewerNames()
         {
@@ -243,6 +243,37 @@ namespace CoffeeLogger
                     com.ExecuteNonQuery();
                 }
             }
+        }
+
+        public bool IsGrindSettingTaken(string grinderName, string grindSetting)
+        {
+            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
+            {
+                db.Open();
+
+                long count;
+                using (SQLiteCommand com = new SQLiteCommand("Select COUNT(*) FROM GrindSettings WHERE @name = GrinderName AND @setting = GrindSetting", db))
+                {
+                    com.Parameters.AddWithValue("@name", grinderName);
+                    com.Parameters.AddWithValue("@setting", grindSetting);
+                    count = (long)com.ExecuteScalar();
+                }
+                return count > 0;
+            }    
+        }
+        public void AddGrindSetting(string grinderName, string grindSetting)
+        {
+            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
+            {
+                db.Open();
+
+                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO GrindSettings (GrinderName, GrindSetting) VALUES (@name, @setting)", db))
+                {
+                    com.Parameters.AddWithValue("@name", grinderName);
+                    com.Parameters.AddWithValue("@setting", grindSetting);
+                    com.ExecuteNonQuery();
+                }
+            }    
         }
 
         public void AddBrewer(string brewerName, BrewMethod brewMethod = BrewMethod.None)
