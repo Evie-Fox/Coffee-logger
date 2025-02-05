@@ -8,9 +8,10 @@ namespace CoffeeLogger
 
         public static Program instance;
 
-        private GrinderManager gm;
-        private GrinderSettingManager gsm;
-        private CoffeeBeansManager bm;
+        private GrinderManager grinderMam;
+        private GrinderSettingManager grindSettingMan;
+        private CoffeeBeansManager beanMan;
+        private BrewerManager brewerMan;
 
         private static void Main()
         {
@@ -27,9 +28,10 @@ namespace CoffeeLogger
             db = new SQLController();
             db.Activate();
 
-            gm = new GrinderManager(db);
-            gsm = new GrinderSettingManager(db, gm);
-            bm = new CoffeeBeansManager(db);
+            grinderMam = new GrinderManager(db);
+            grindSettingMan = new GrinderSettingManager(db, grinderMam);
+            beanMan = new CoffeeBeansManager(db);
+            brewerMan = new BrewerManager(db);
 
             ConsoleReader();
             Console.WriteLine("\n\nShutting down");
@@ -55,24 +57,25 @@ namespace CoffeeLogger
                         break;
 
                     case "newgrinder" or "addgrinder":
-                        await gm.AddNewGrinderFromConsole();
+                        await grinderMam.AddNewGrinderFromConsole();
                         break;
                     case "grinders":
                         Console.WriteLine("\n\n" + String.Join("\n", db.GetGrinderNames()) + "\n");
                         break;
 
                     case "newgrind":
-                        await gsm.AddNewGrindSetting();
+                        await grindSettingMan.AddNewGrindSetting();
                         break;
 
                     case "newbrewer" or "addbrewer":
+                        await brewerMan.AddNewBrewer();
                         break;
                     case "brewers":
                         Console.WriteLine("\n\n" + String.Join("\n", db.GetBrewerNames()) + "\n");
                         break;
 
                     case "newcoffee" or "newbeans" or "newcoffeebeans" or "addcoffee" or "addbeans":
-                        await bm.AddNewCoffeeBeans();
+                        await beanMan.AddNewCoffeeBeans();
                         break;
                     case "coffee" or "beans" or "coffeebeans":
                         Console.WriteLine("\n\n" + String.Join("\n", db.GetCoffeeNames()) + "\n");
