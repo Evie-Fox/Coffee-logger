@@ -106,11 +106,11 @@
 
             Console.WriteLine("\nChoose coffee beans:\n");
 
+            Console.WriteLine($"0. New beans\n");
             for (int i = 0; namesLength > i; i++)
             {
-                Console.WriteLine($"{i}. {names[i]}\n");
+                Console.WriteLine($"{i + 1}. {names[i]}\n");
             }
-            Console.WriteLine($"{namesLength}. New beans\n");
 
             string? inputNum;
             while (true)
@@ -132,14 +132,14 @@
                     Console.WriteLine("\n\nOutside of range\n");
                     continue;
                 }
-                if (num == namesLength)
+                if (num == 0)
                 {
                     string? newBrewerName = await AddNewCoffeeBeans();
                     if (newBrewerName == null)
                     { continue; }
                     return newBrewerName;
                 }
-                return names[num];
+                return names[num - 1];
             }
         }
 

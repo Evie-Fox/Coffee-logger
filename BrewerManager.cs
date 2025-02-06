@@ -68,14 +68,14 @@
             string[] names = db.Brewers.GetBrewerNames();
             int namesLength = names.Length;
 
-            Console.WriteLine("\nChoose a grinder:\n");
+            Console.WriteLine("\nChoose a brewer:\n");
 
+            Console.WriteLine($"0. New brewer\n");
             for (int i = 0; namesLength > i; i++)
             {
-                Console.WriteLine($"{i}. {names[i]}\n");
+                Console.WriteLine($"{i + 1}. {names[i]}\n");
             }
 
-            Console.WriteLine($"{namesLength}. New grinder\n");
 
 
             string? inputNum;
@@ -98,14 +98,14 @@
                     Console.WriteLine("\n\nOutside of range\n");
                     continue;
                 }
-                if (num == namesLength)
+                if (num == 0)
                 {
                     string? newBrewerName = await AddNewBrewer();
                     if ( newBrewerName == null)
                     { continue; }
                     return newBrewerName;
                 }
-                return names[num];
+                return names[num - 1];
             }
         }
 

@@ -63,10 +63,14 @@ namespace CoffeeLogger
             {
                 db.Open();
 
+                using (SQLiteCommand com = new("PRAGMA foreign_keys = ON", db))
+                {
+                    com.ExecuteNonQuery();
+                }
+
                 SQLiteCommand beansTable = new SQLiteCommand(@"
             CREATE TABLE CoffeeBeans(
-            CoffeeBeanID INTEGER PRIMARY KEY,
-            Name VARCHAR(255) NOT NULL,
+            Name VARCHAR(255) PRIMARY KEY,
             RoasterName VARCHAR(255),
             Origin VARCHAR(255),
             RoastLevelEnum INT
@@ -76,8 +80,7 @@ namespace CoffeeLogger
 
                 SQLiteCommand brewersTable = new SQLiteCommand(@"
             CREATE TABLE Brewers(
-            BrewerID INTEGER PRIMARY KEY,
-            Name VARCHAR(255) UNIQUE NOT NULL,
+            Name VARCHAR(255) PRIMARY KEY,
             BrewMethodEnum INT NOT NULL
             )", db);
 
@@ -104,14 +107,14 @@ namespace CoffeeLogger
                 SQLiteCommand BrewsTable = new SQLiteCommand(@"
             CREATE TABLE Brews(
             BrewID INTEGER PRIMARY KEY,
-            CoffeeBeanID INT NOT NULL,
-            BrewerID INT NOT NULL,
+            CoffeeBeansName VARCHAR(255) NOT NULL,
+            BrewerName VARCHAR(255) NOT NULL,
             GrindSetting VARCHAR(255) NOT NULL,
             GrinderName VARCHAR(255) NOT NULL,
             GramsPerLiter INT NOT NULL,
-            UNIQUE (CoffeeBeanID, BrewerID, GrinderName, GrindSetting)
-            FOREIGN KEY (CoffeeBeanID) REFERENCES CoffeeBeans(CoffeeBeanID),
-            FOREIGN KEY (BrewerID) REFERENCES Brewers(BrewerID),
+            UNIQUE (CoffeeBeansName, BrewerName, GrinderName, GrindSetting),
+            FOREIGN KEY (CoffeeBeansName) REFERENCES CoffeeBeans(Name),
+            FOREIGN KEY (BrewerName) REFERENCES Brewers(Name),
             FOREIGN KEY (GrinderName,GrindSetting) REFERENCES GrindSettings(GrinderName, GrindSetting)
             )", db);
 

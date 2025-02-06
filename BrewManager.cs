@@ -40,12 +40,12 @@ namespace CoffeeLogger
                         Console.WriteLine("!!");
                         while (true)
                         {
-                            string? grindSetting = await grindMan.ChooseOrAddGrindSetting(grinderName);//Add beans
+                            string? grindSetting = await grindMan.ChooseOrAddGrindSetting(grinderName, coffeeBeansName, brewerName);
                             if (grindSetting == null)
                             { break; }
                             while (true)
                             {
-                                Console.WriteLine("reached end");
+                                Console.WriteLine("reached end!!");
                                 return;
                             }
                         }

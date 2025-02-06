@@ -43,7 +43,7 @@ namespace CoffeeLogger
             }
         }
         
-        public string?[] GetRegisteredGrindSettingsOrNull(string grinderName, int coffeeBeansID)
+        public string?[] GetBrewedGrindSettingsOrNull(string grinderName, string coffeeBeansName, string brewerName)
         {
 
             using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))
@@ -51,9 +51,11 @@ namespace CoffeeLogger
                 dbController.db.Open();
                 List<string> settings = new();
 
-                using (SQLiteCommand com = new SQLiteCommand("SELECT GrindSetting From Brews WHERE @grinderName = GrinderName"))
+                using (SQLiteCommand com = new SQLiteCommand("SELECT GrindSetting From Brews WHERE @coffeeBeansName = CoffeeBeansName AND @brewerName = BrewerName AND @grinderName = GrinderName", dbController.db))
                 {
                     com.Parameters.AddWithValue("@grinderName", grinderName);
+                    com.Parameters.AddWithValue("@coffeeBeansName", coffeeBeansName);
+                    com.Parameters.AddWithValue("@brewerName",brewerName);
                     SQLiteDataReader data = com.ExecuteReader();
 
                     while (data.Read())

@@ -52,7 +52,7 @@ namespace CoffeeLogger
             }
         }
 
-        public async Task<string?> ChooseOrAddGrindSetting(string? grinderName)
+        public async Task<string?> ChooseOrAddGrindSetting(string? grinderName, string beansName, string brewerName)
         {
             while (true)
             {
@@ -68,14 +68,14 @@ namespace CoffeeLogger
 
                 Console.WriteLine($"\nChose {grinderName} with the format of: {grinderFormat}\n\n");
 
-                string?[] registeredGrinds = db.GrindSettings.GetRegisteredGrindSettingsOrNull(grinderName);
+                string?[] registeredGrinds = db.GrindSettings.GetBrewedGrindSettingsOrNull(grinderName, beansName, brewerName);
                 int length = registeredGrinds.Length;
 
+                Console.WriteLine("\n0. New grind\n");
                 for (int i = 0; length > i; i++)
                 {
-                    Console.WriteLine($"{i}. {registeredGrinds[i]}\n");
+                    Console.WriteLine($"{i + 1}. {registeredGrinds[i]}\n");
                 }
-                Console.WriteLine($"\n{++length}. New grind\n");
                 while (true) 
                 {
                     string? grindIndex = await Program.ReadWithEsc();
@@ -93,9 +93,9 @@ namespace CoffeeLogger
                     {
                         Console.WriteLine("\nNumber is outside pf range, please choose one of the shown numbers\n");
                     }
-                    if (grindNum != length)
+                    if (grindNum != 0)
                     {
-                        return registeredGrinds[grindNum];
+                        return registeredGrinds[grindNum - 1];
                     }
                     string? newGrind = await ChooseGrindSetting(grinderName);
                     if (newGrind == null)
@@ -110,7 +110,13 @@ namespace CoffeeLogger
         {
             string? newSetting;
             while (true)
-            {
+            {   string? format = gm.GetGrinderDialFormatOrNull(grinderName);
+                if (format == null)
+                {
+                    Console.WriteLine("\nFormat not found\n");
+                    return null; 
+                }
+                Console.WriteLine($"\nFormat: {format}\n");
                 Console.Write("\n>");
                 newSetting = await Program.ReadWithEsc();
                 if (string.IsNullOrWhiteSpace(newSetting))

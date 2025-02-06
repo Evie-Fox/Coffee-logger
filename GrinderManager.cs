@@ -25,18 +25,18 @@ namespace CoffeeLogger
         }
 
 
-        public async Task AddNewGrinderFromConsole()
+        public async Task<string?> AddNewGrinderFromConsole()
         {
-            while (true) //allows to return to entering a name
+            while (true)
             {
                 string? name, format;
                 while (true)
                 {
-                    Console.Write("\nEnter grinder name:\n>");
+                    Console.Write("\nEnter grinder name:\n\n>");
                     name = await Program.ReadWithEsc();
                     if (string.IsNullOrWhiteSpace(name))
                     {
-                        return;
+                        return null;
                     }
                     name = name.Trim();
                     if (!name.All(x => char.IsAsciiLetter(x) || x == ' ' || x == '(' || x == ')'))
@@ -68,7 +68,7 @@ namespace CoffeeLogger
                     }
                     format = new GrindDial(format).GetDialFormatString();
                     AddNewGrinder(name, format);
-                    return;
+                    return name;
                 }
 
             }
@@ -115,13 +115,8 @@ namespace CoffeeLogger
             string[] names = db.Grinders.GetGrinderNames();
             int namesLength = names.Length;
 
-            if (namesLength == 0) 
-            {
-                Console.WriteLine("No grinder registered, Please add a grinder");
-                return null;
-            }
-            Console.WriteLine("\nRegistered grinders:\n");
-
+            Console.WriteLine("\n\nChoose a grinder:\n");
+            Console.WriteLine("0. New grinder\n");
             for (int i = 0; namesLength > i; i++)
             {
                 Console.WriteLine($"{i + 1}. {names[i]}");
@@ -129,7 +124,7 @@ namespace CoffeeLogger
             string? inputNum;
             while (true)
             {
-                Console.Write("\nEnter grinder's number:\n>");
+                Console.Write("\nEnter grinder's number:\n\n>");
                 inputNum = await Program.ReadWithEsc();
                 if (string.IsNullOrWhiteSpace(inputNum))
                 {
@@ -142,10 +137,17 @@ namespace CoffeeLogger
                     continue;
                 }
                 int num = int.Parse(inputNum);
-                if (num < 1 || num > namesLength + 1)
+                if (num < 0 || num > namesLength)
                 {
                     Console.WriteLine("\n\nOutside of range\n");
                     continue;
+                }
+                if (num == 0)
+                {
+                    string? name = await AddNewGrinderFromConsole();
+                    if (name == null) 
+                    { continue; }
+                    return name;
                 }
                 return names[num - 1];
             }
