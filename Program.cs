@@ -9,7 +9,7 @@ namespace CoffeeLogger
         public static Program instance;
 
         private GrinderManager grinderMam;
-        private GrinderSettingManager grindSettingMan;
+        private GrindSettingManager grindSettingMan;
         private CoffeeBeansManager beanMan;
         private BrewerManager brewerMan;
         private BrewManager brewMan;
@@ -30,7 +30,7 @@ namespace CoffeeLogger
             db.Activate();
 
             grinderMam = new GrinderManager(db);
-            grindSettingMan = new GrinderSettingManager(db, grinderMam);
+            grindSettingMan = new GrindSettingManager(db, grinderMam);
             beanMan = new CoffeeBeansManager(db);
             brewerMan = new BrewerManager(db);
             brewMan = new BrewManager(db, grinderMam, beanMan, brewerMan);

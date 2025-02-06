@@ -4,13 +4,20 @@ namespace CoffeeLogger
 {
     public class GrindSettingDB
     {
+        private SQLController dbController;
+
+        public GrindSettingDB(SQLController dbController)
+        {
+            this.dbController = dbController;
+        }
+
         public void AddGrindSetting(string grinderName, string grindSetting)
         {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
+            using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))
             {
-                db.Open();
+                dbController.db.Open();
 
-                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO GrindSettings (GrinderName, GrindSetting) VALUES (@name, @setting)", db))
+                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO GrindSettings (GrinderName, GrindSetting) VALUES (@name, @setting)", dbController.db))
                 {
                     com.Parameters.AddWithValue("@name", grinderName);
                     com.Parameters.AddWithValue("@setting", grindSetting);
@@ -21,12 +28,12 @@ namespace CoffeeLogger
 
         public bool IsGrindSettingTaken(string grinderName, string grindSetting)
         {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
+            using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))
             {
-                db.Open();
+                dbController.db.Open();
 
                 long count;
-                using (SQLiteCommand com = new SQLiteCommand("Select COUNT(*) FROM GrindSettings WHERE @name = GrinderName AND @setting = GrindSetting", db))
+                using (SQLiteCommand com = new SQLiteCommand("Select COUNT(*) FROM GrindSettings WHERE @name = GrinderName AND @setting = GrindSetting", dbController.db))
                 {
                     com.Parameters.AddWithValue("@name", grinderName);
                     com.Parameters.AddWithValue("@setting", grindSetting);

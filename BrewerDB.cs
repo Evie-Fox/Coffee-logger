@@ -4,13 +4,20 @@ namespace CoffeeLogger
 {
     public class BrewerDB
     {
+        private SQLController dbController;
+
+        public BrewerDB(SQLController dbController)
+        {
+            this.dbController = dbController;
+        }
+
         public void AddBrewer(string brewerName, BrewMethod brewMethod = BrewMethod.None)
         {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
+            using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))
             {
-                db.Open();
+                dbController.db.Open();
 
-                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO Brewers (Name, BrewMethodEnum) VALUES (@name, @method)", db))
+                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO Brewers (Name, BrewMethodEnum) VALUES (@name, @method)", dbController.db))
                 {
                     com.Parameters.AddWithValue("@name", brewerName);
                     com.Parameters.AddWithValue("@method", brewMethod);
@@ -21,15 +28,10 @@ namespace CoffeeLogger
 
         public string[] GetBrewerNames()
         {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
+            using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))
             {
-                db.Open();
-                SQLiteCommand com = new SQLiteCommand(@"
-
-                SELECT Name
-                FROM Brewers
-
-                ", db);
+                dbController.db.Open();
+                SQLiteCommand com = new SQLiteCommand(@" SELECT Name FROM Brewers", dbController.db);
                 SQLiteDataReader data = com.ExecuteReader();
                 List<string> names = new List<string>();
                 while (data.Read())

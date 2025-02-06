@@ -15,12 +15,12 @@
             { roasterName = null; }
             if (string.IsNullOrWhiteSpace(origin)) 
             { origin = null; }
-            db.AddBean(name, roasterName, origin, roast);
+            db.Beans.AddBean(name, roasterName, origin, roast);
         }
 
         private bool CoffeeNameIsTaken(string coffeeBeanName)
         {
-            return db.GetCoffeeNames().Contains(coffeeBeanName);
+            return db.Beans.GetCoffeeNames().Contains(coffeeBeanName);
         }
 
         public async Task AddNewCoffeeBeans()

@@ -10,16 +10,16 @@ namespace CoffeeLogger
         public BeanDB Beans;
 
         private string _pathToDir = @"..\..\..\DB\";
-        private string _pathToFile = @"..\..\..\DB\MainDB.db";
-        private SQLiteConnection db;
+        public string _pathToFile { get; private set; } = @"..\..\..\DB\MainDB.db";
+        public SQLiteConnection db;
 
         public SQLController()
 
         {
-            Grinders = new GrinderDB();
-            GrindSettings = new GrindSettingDB();
-            Brewers = new BrewerDB();
-            Beans = new BeanDB();
+            Grinders = new GrinderDB(this);
+            GrindSettings = new GrindSettingDB(this);
+            Brewers = new BrewerDB(this);
+            Beans = new BeanDB(this);
         }
 
         public void Activate()

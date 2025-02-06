@@ -4,15 +4,20 @@ namespace CoffeeLogger
 {
     public class BeanDB
     {
+        private SQLController dbController;
 
+        public BeanDB(SQLController dbController)
+        {
+            this.dbController = dbController;
+        }
 
         public void AddBean(string beanName, string? rosterName, string? origin, RoastLevel roast = RoastLevel.None)//this it not it
         {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
+            using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))
             {
-                db.Open();
+                dbController.db.Open();
 
-                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO CoffeeBeans (Name, RoasterName, Origin, RoastLevelEnum) VALUES (@name, @roasterName, @origin,@roast)", db))
+                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO CoffeeBeans (Name, RoasterName, Origin, RoastLevelEnum) VALUES (@name, @roasterName, @origin,@roast)", dbController.db))
                 {
 
                     com.Parameters.AddWithValue("@name", beanName);
@@ -26,15 +31,10 @@ namespace CoffeeLogger
 
         public string[] GetCoffeeNames()
         {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
+            using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))
             {
-                db.Open();
-                SQLiteCommand com = new SQLiteCommand(@"
-
-                SELECT Name
-                FROM CoffeeBeans
-
-                ", db);
+                dbController.db.Open();
+                SQLiteCommand com = new SQLiteCommand(@"SELECT Name FROM CoffeeBeans", dbController.db);
                 SQLiteDataReader data = com.ExecuteReader();
                 List<string> names = new List<string>();
                 while (data.Read())

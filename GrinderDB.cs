@@ -4,13 +4,19 @@ namespace CoffeeLogger
 {
     public class GrinderDB
     {
+        private SQLController dbController;
+
+        public GrinderDB(SQLController db)
+        {
+            dbController = db;
+        }
         public void AddGrinder(string grinderName, string format)
         {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
+            using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))
             {
-                db.Open();
+                dbController.db.Open();
 
-                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO Grinders (Name, DialFormat) VALUES (@name, @format)", db))
+                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO Grinders (Name, DialFormat) VALUES (@name, @format)", dbController.db))
                 {
 
                     com.Parameters.AddWithValue("@name", grinderName);
@@ -23,16 +29,16 @@ namespace CoffeeLogger
 
         public string GetGrinderDialFormat(string grinderName)
         {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
+            using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))
             {
-                db.Open();
+                dbController.db.Open();
                 SQLiteCommand com = new SQLiteCommand(@$"
                 
                 SELECT DialFormat
                 FROM Grinders
                 WHERE Name = @grinderName
                 
-                ", db);
+                ", dbController.db);
 
                 com.Parameters.AddWithValue("@grinderName", grinderName);
 
@@ -49,15 +55,15 @@ namespace CoffeeLogger
 
         public string[] GetGrinderNames()
         {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
+            using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))
             {
-                db.Open();
+                dbController.db.Open();
                 SQLiteCommand com = new SQLiteCommand(@"
 
                 SELECT Name
                 FROM Grinders
 
-                ", db);
+                ", dbController.db);
                 SQLiteDataReader data = com.ExecuteReader(); //<here it crushes
                 List<string> names = new List<string>();
                 while (data.Read())

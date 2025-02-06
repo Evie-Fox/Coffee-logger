@@ -1,12 +1,12 @@
 ﻿
 namespace CoffeeLogger
 {
-    class GrinderSettingManager
+    class GrindSettingManager
     {
         private SQLController db;
         private GrinderManager gm;
 
-        public GrinderSettingManager(SQLController db, GrinderManager gm)
+        public GrindSettingManager(SQLController db, GrinderManager gm)
         {
             this.db = db;
             this.gm = gm;
@@ -38,13 +38,13 @@ namespace CoffeeLogger
                     string? newSetting = await ChooseGrindSetting(grinderName);
                     if (newSetting == null)
                     { return; }
-                    if (db.IsGrindSettingTaken(grinderName, newSetting))
+                    if (db.GrindSettings.IsGrindSettingTaken(grinderName, newSetting))
                     {
                         Console.WriteLine("\nGrind setting already exists\n");
                         continue;
                     }
                     Console.WriteLine($"\n {newSetting} is compatible with {grinderName}.\n");
-                    db.AddGrindSetting(grinderName, newSetting);
+                    db.GrindSettings.AddGrindSetting(grinderName, newSetting);
                     return;
                 }
             }

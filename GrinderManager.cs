@@ -19,8 +19,8 @@ namespace CoffeeLogger
                 return false;
             }
 
-            db.AddGrinder(name, format);
-            Console.WriteLine($"\n\nGrinders on DB: {string.Join(", ", db.GetGrinderNames())}");
+            db.Grinders.AddGrinder(name, format);
+            Console.WriteLine($"\n\nGrinders on DB: {string.Join(", ", db.Grinders.GetGrinderNames())}");
             return true;
         }
 
@@ -76,7 +76,7 @@ namespace CoffeeLogger
 
         public bool IsGrinderRegistered(string name)
         {
-            string[] grinderNamesOnDB = db.GetGrinderNames();
+            string[] grinderNamesOnDB = db.Grinders.GetGrinderNames();
             return grinderNamesOnDB.Contains(name);
         }
 
@@ -87,7 +87,7 @@ namespace CoffeeLogger
                 Console.WriteLine("Grinder doesn't exist");
                 return null;
             }
-            return db.GetGrinderDialFormat(grinderName);
+            return db.Grinders.GetGrinderDialFormat(grinderName);
         }
 
         public bool IsSettingCompatible(string grinderName, GrindDial newSetting)
@@ -112,7 +112,7 @@ namespace CoffeeLogger
 
         public async Task<string?> ChooseGrinder()
         {
-            string[] names = db.GetGrinderNames();
+            string[] names = db.Grinders.GetGrinderNames();
             int namesLength = names.Length;
 
             if (namesLength == 0) 
