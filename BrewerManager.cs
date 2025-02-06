@@ -9,17 +9,17 @@
             db = dbRef;
         }
 
-        public async Task AddNewBrewer()
+        public async Task<string?> AddNewBrewer()
         {
-            while (true)
-            {
                 string? brewerName;
                 BrewMethod brewMethod = BrewMethod.None;
+            while (true)
+            {
 
                 Console.WriteLine("\nEnter Brewer name:\n");
                 brewerName = await Program.ReadWithEsc();
                 if (string.IsNullOrWhiteSpace(brewerName))
-                { return; }
+                { return null; }
                 brewerName = brewerName.Trim();
 
                 if (IsBrewerNameTaken(brewerName))
@@ -42,7 +42,7 @@
                     {
                         db.Brewers.AddBrewer(brewerName, BrewMethod.None);
                         Console.WriteLine($"\nAdded {brewerName} brewer to DB\n");
-                        return;
+                        return brewerName;
                     }
 
                     if (!val.All(x => char.IsDigit(x)))
@@ -59,8 +59,53 @@
                     brewMethod = (BrewMethod)num;
                     db.Brewers.AddBrewer(brewerName, brewMethod);
                     Console.WriteLine($"\nAdded {brewerName} brewer to DB\n");
-                    return;
+                    return brewerName;
                 }
+            }
+        }
+        public async Task<string?> ChooseOrAddBrewer()
+        {
+            string[] names = db.Brewers.GetBrewerNames();
+            int namesLength = names.Length;
+
+            Console.WriteLine("\nChoose a grinder:\n");
+
+            for (int i = 0; namesLength > i; i++)
+            {
+                Console.WriteLine($"{i}. {names[i]}\n");
+            }
+
+            Console.WriteLine($"{namesLength}. New grinder\n");
+
+
+            string? inputNum;
+            while (true)
+            {
+                inputNum = await Program.ReadWithEsc();
+                if (string.IsNullOrWhiteSpace(inputNum))
+                {
+                    return null;
+                }
+                inputNum = inputNum.Trim();
+                if (!inputNum.All(x => char.IsAsciiDigit(x)))
+                {
+                    Console.WriteLine("Invalid number\n");
+                    continue;
+                }
+                int num = int.Parse(inputNum);
+                if (num < 0 || num > namesLength)
+                {
+                    Console.WriteLine("\n\nOutside of range\n");
+                    continue;
+                }
+                if (num == namesLength)
+                {
+                    string? newBrewerName = await AddNewBrewer();
+                    if ( newBrewerName == null)
+                    { continue; }
+                    return newBrewerName;
+                }
+                return names[num];
             }
         }
 

@@ -1,7 +1,9 @@
 ﻿
+using System.Data.SQLite;
+
 namespace CoffeeLogger
 {
-    class GrindSettingManager
+    public class GrindSettingManager
     {
         private SQLController db;
         private GrinderManager gm;
@@ -47,6 +49,60 @@ namespace CoffeeLogger
                     db.GrindSettings.AddGrindSetting(grinderName, newSetting);
                     return;
                 }
+            }
+        }
+
+        public async Task<string?> ChooseOrAddGrindSetting(string? grinderName)
+        {
+            while (true)
+            {
+                if (grinderName == null)
+                { return null; }
+
+                string grinderFormat = gm.GetGrinderDialFormatOrNull(grinderName);
+                if (grinderFormat == null)
+                {
+                    Console.WriteLine("\nSomething went wrong, grinder doesn't have a format.\n");
+                    return null;
+                }
+
+                Console.WriteLine($"\nChose {grinderName} with the format of: {grinderFormat}\n\n");
+
+                string?[] registeredGrinds = db.GrindSettings.GetRegisteredGrindSettingsOrNull(grinderName);
+                int length = registeredGrinds.Length;
+
+                for (int i = 0; length > i; i++)
+                {
+                    Console.WriteLine($"{i}. {registeredGrinds[i]}\n");
+                }
+                Console.WriteLine($"\n{++length}. New grind\n");
+                while (true) 
+                {
+                    string? grindIndex = await Program.ReadWithEsc();
+                    if (grindIndex == null)
+                    {
+                        return null;
+                    }
+                    if (!grindIndex.Replace(" ", string.Empty).All(x => char.IsDigit(x)))
+                    {
+                        Console.WriteLine("\nInvalid format, please choose one of the shown numbers\n");
+                        continue;
+                    }
+                    int grindNum = int.Parse(grindIndex);
+                    if (grindNum < 0 || grindNum > length) 
+                    {
+                        Console.WriteLine("\nNumber is outside pf range, please choose one of the shown numbers\n");
+                    }
+                    if (grindNum != length)
+                    {
+                        return registeredGrinds[grindNum];
+                    }
+                    string? newGrind = await ChooseGrindSetting(grinderName);
+                    if (newGrind == null)
+                    { continue; }
+                    return newGrind;
+                }
+
             }
         }
 

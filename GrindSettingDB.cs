@@ -42,5 +42,28 @@ namespace CoffeeLogger
                 return count > 0;
             }
         }
+        
+        public string?[] GetRegisteredGrindSettingsOrNull(string grinderName, int coffeeBeansID)
+        {
+
+            using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))
+            {
+                dbController.db.Open();
+                List<string> settings = new();
+
+                using (SQLiteCommand com = new SQLiteCommand("SELECT GrindSetting From Brews WHERE @grinderName = GrinderName"))
+                {
+                    com.Parameters.AddWithValue("@grinderName", grinderName);
+                    SQLiteDataReader data = com.ExecuteReader();
+
+                    while (data.Read())
+                    {
+                        settings.Add(data["GrindSetting"].ToString());
+                    }
+                    return settings.ToArray();
+
+                }
+            }
+        }
     }
 }

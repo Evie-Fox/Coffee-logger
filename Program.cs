@@ -33,7 +33,7 @@ namespace CoffeeLogger
             grindSettingMan = new GrindSettingManager(db, grinderMam);
             beanMan = new CoffeeBeansManager(db);
             brewerMan = new BrewerManager(db);
-            brewMan = new BrewManager(db, grinderMam, beanMan, brewerMan);
+            brewMan = new BrewManager(db,grinderMam, grindSettingMan, beanMan, brewerMan);
 
             ConsoleReader();
             Console.WriteLine("\n\nShutting down");
@@ -57,6 +57,10 @@ namespace CoffeeLogger
                     case "cleardb":
                         ClearDB(); 
                         break;
+                    case "brew" or "newbrew":
+                        await brewMan.NewBrew();
+                        break;
+
 
                     case "newgrinder" or "addgrinder":
                         await grinderMam.AddNewGrinderFromConsole();

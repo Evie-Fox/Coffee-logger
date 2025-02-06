@@ -23,7 +23,7 @@
             return db.Beans.GetCoffeeNames().Contains(coffeeBeanName);
         }
 
-        public async Task AddNewCoffeeBeans()
+        public async Task<string?> AddNewCoffeeBeans()
         {
             while (true)
             {
@@ -33,7 +33,7 @@
                 Console.WriteLine("\nEnter coffee beans name:\n");
                 coffeeName = await ReadWithEsc();
                 if (string.IsNullOrWhiteSpace(coffeeName))
-                { return; }
+                { return null; }
                 coffeeName = coffeeName.Trim();
 
                 if (CoffeeNameIsTaken(coffeeName))
@@ -61,7 +61,7 @@
                         origin = origin.Trim();
                         while (true)
                         {
-                            string val;
+                            string? val;
                             Console.WriteLine("\nChoose roast level:  (Optional)\n1. Light roast\n2. Medium roast\n3. Dark roast");
                             val = await ReadWithEsc();
                             if (val == null)
@@ -74,7 +74,7 @@
                             {
                                 AddNewCoffeeBeans(coffeeName,roasterName,origin);
                                 Console.WriteLine($"\nAdded {coffeeName} coffee beans to DB\n");
-                                return;
+                                return coffeeName;
                             }
 
                             if (!val.All(x => char.IsDigit(x)))
@@ -91,10 +91,55 @@
                             roast = (RoastLevel)num;
                             AddNewCoffeeBeans(coffeeName, roasterName, origin, roast);
                             Console.WriteLine($"\nAdded {coffeeName} coffee beans to DB\n");
-                            return;
+                            return coffeeName;
                         }
                     }
                 }
+            }
+        }
+
+        public async Task<string?> ChooseOrAddCoffeeBeans()
+        {
+            string? beansName;
+            string[] names = db.Beans.GetCoffeeNames();
+            int namesLength = names.Length;
+
+            Console.WriteLine("\nChoose coffee beans:\n");
+
+            for (int i = 0; namesLength > i; i++)
+            {
+                Console.WriteLine($"{i}. {names[i]}\n");
+            }
+            Console.WriteLine($"{namesLength}. New beans\n");
+
+            string? inputNum;
+            while (true)
+            {
+                inputNum = await Program.ReadWithEsc();
+                if (string.IsNullOrWhiteSpace(inputNum))
+                {
+                    return null;
+                }
+                inputNum = inputNum.Trim();
+                if (!inputNum.All(x => char.IsAsciiDigit(x)))
+                {
+                    Console.WriteLine("Invalid number\n");
+                    continue;
+                }
+                int num = int.Parse(inputNum);
+                if (num < 0 || num > namesLength)
+                {
+                    Console.WriteLine("\n\nOutside of range\n");
+                    continue;
+                }
+                if (num == namesLength)
+                {
+                    string? newBrewerName = await AddNewCoffeeBeans();
+                    if (newBrewerName == null)
+                    { continue; }
+                    return newBrewerName;
+                }
+                return names[num];
             }
         }
 
