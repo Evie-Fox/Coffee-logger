@@ -4,9 +4,23 @@ namespace CoffeeLogger
 {
     public class SQLController
     {
+        public GrinderDB Grinders;
+        public GrindSettingDB GrindSettings;
+        public BrewerDB Brewers;
+        public BeanDB Beans;
+
         private string _pathToDir = @"..\..\..\DB\";
         private string _pathToFile = @"..\..\..\DB\MainDB.db";
         private SQLiteConnection db;
+
+        public SQLController()
+
+        {
+            Grinders = new GrinderDB();
+            GrindSettings = new GrindSettingDB();
+            Brewers = new BrewerDB();
+            Beans = new BeanDB();
+        }
 
         public void Activate()
         {
@@ -69,7 +83,6 @@ namespace CoffeeLogger
 
                 brewersTable.ExecuteNonQuery();
 
-
                 SQLiteCommand GrinderTable = new SQLiteCommand(@"
             CREATE TABLE Grinders(
             Name VARCHAR(255) PRIMARY KEY,
@@ -120,7 +133,6 @@ namespace CoffeeLogger
 
         public void ClearDB()
         {
-
             using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
             {
                 db.Open();
@@ -132,182 +144,29 @@ namespace CoffeeLogger
                     string tableName = data.GetString(0);
                     if (tableName != "sqlite_sequence")
                     {
-                        com = new SQLiteCommand($@"DELETE FROM {tableName}",db);
+                        com = new SQLiteCommand($@"DELETE FROM {tableName}", db);
                         com.ExecuteNonQuery();
                     }
                 }
             }
         }
 
-        public string[] GetGrinderNames()
-        {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
-            {
-                db.Open();
-                SQLiteCommand com = new SQLiteCommand(@"
-
-                SELECT Name
-                FROM Grinders
-
-                ", db);
-                SQLiteDataReader data = com.ExecuteReader(); //<here it crushes
-                List<string> names = new List<string>();
-                while (data.Read())
-                {
-                    names.Add(data["Name"].ToString());
-                }
-                return names.ToArray();
-            }
-        }
-        
-        public string GetGrinderDialFormat(string grinderName)
-        {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
-            {
-                db.Open();
-                SQLiteCommand com = new SQLiteCommand(@$"
-                
-                SELECT DialFormat
-                FROM Grinders
-                WHERE Name = @grinderName
-                
-                ", db);
-                
-                com.Parameters.AddWithValue("@grinderName", grinderName);
-
-                SQLiteDataReader data = com.ExecuteReader();
-                string result = string.Empty;
-                while (data.Read())
-                {
-                    result = data["DialFormat"].ToString();
-                }
-                return result;
-
-            }
-        }
-
-
-        public string[] GetBrewerNames()
-        {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
-            {
-                db.Open();
-                SQLiteCommand com = new SQLiteCommand(@"
-
-                SELECT Name
-                FROM Brewers
-
-                ", db);
-                SQLiteDataReader data = com.ExecuteReader();
-                List<string> names = new List<string>();
-                while (data.Read())
-                {
-                    names.Add(data["Name"].ToString());
-                }
-                return names.ToArray();
-            }
-        }
-
-        public string[] GetCoffeeNames()
-        {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
-            {
-                db.Open();
-                SQLiteCommand com = new SQLiteCommand(@"
-
-                SELECT Name
-                FROM CoffeeBeans
-
-                ", db);
-                SQLiteDataReader data = com.ExecuteReader();
-                List<string> names = new List<string>();
-                while (data.Read())
-                {
-                    names.Add(data["Name"].ToString());
-                }
-                return names.ToArray();
-            }
-        }
-
-        public void AddGrinder(string grinderName, string format)
+        public bool IsBrewTaken(int CoffeeBeanID, int BrewerID, string GrinderName, string GrindSetting)
         {
             using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
             {
                 db.Open();
 
-                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO Grinders (Name, DialFormat) VALUES (@name, @format)", db))
+                using (SQLiteCommand com = new SQLiteCommand("SELECT COUNT(*) FROM Brews WHERE @beanID = CoffeeBeanID AND @brewerID = BrewerID AND @grinderName = GrinderName AND @grindSetting = GrindSetting"))
                 {
-
-                    com.Parameters.AddWithValue("@name", grinderName);
-                    com.Parameters.AddWithValue("@format", format);
-                    com.ExecuteNonQuery();
+                    com.Parameters.AddWithValue("@beanID", CoffeeBeanID);
+                    com.Parameters.AddWithValue("@brewerID", BrewerID);
+                    com.Parameters.AddWithValue("@grinderName", GrinderName);
+                    com.Parameters.AddWithValue("@grindSetting", GrindSetting);
+                    long count = (long)com.ExecuteScalar();
+                    return count > 0;
                 }
             }
         }
-
-        public bool IsGrindSettingTaken(string grinderName, string grindSetting)
-        {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
-            {
-                db.Open();
-
-                long count;
-                using (SQLiteCommand com = new SQLiteCommand("Select COUNT(*) FROM GrindSettings WHERE @name = GrinderName AND @setting = GrindSetting", db))
-                {
-                    com.Parameters.AddWithValue("@name", grinderName);
-                    com.Parameters.AddWithValue("@setting", grindSetting);
-                    count = (long)com.ExecuteScalar();
-                }
-                return count > 0;
-            }    
-        }
-        public void AddGrindSetting(string grinderName, string grindSetting)
-        {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
-            {
-                db.Open();
-
-                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO GrindSettings (GrinderName, GrindSetting) VALUES (@name, @setting)", db))
-                {
-                    com.Parameters.AddWithValue("@name", grinderName);
-                    com.Parameters.AddWithValue("@setting", grindSetting);
-                    com.ExecuteNonQuery();
-                }
-            }    
-        }
-
-        public void AddBrewer(string brewerName, BrewMethod brewMethod = BrewMethod.None)
-        {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
-            {
-                db.Open();
-
-                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO Brewers (Name, BrewMethodEnum) VALUES (@name, @method)", db))
-                {
-
-                    com.Parameters.AddWithValue("@name", brewerName);
-                    com.Parameters.AddWithValue("@method", brewMethod);
-                    com.ExecuteNonQuery();
-                }
-            }
-        }
-        public void AddBean(string beanName, string? rosterName, string? origin,RoastLevel roast = RoastLevel.None)//this it not it
-        {
-            using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
-            {
-                db.Open();
-
-                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO CoffeeBeans (Name, RoasterName, Origin, RoastLevelEnum) VALUES (@name, @roasterName, @origin,@roast)", db))
-                {
-
-                    com.Parameters.AddWithValue("@name", beanName);
-                    com.Parameters.AddWithValue("@roasterName", rosterName);
-                    com.Parameters.AddWithValue("@origin", origin);
-                    com.Parameters.AddWithValue("@roast", (int)roast);
-                    com.ExecuteNonQuery();
-                }
-            }
-        }
-        
     }
 }

@@ -40,7 +40,7 @@
 
                     if (string.IsNullOrWhiteSpace(val))
                     {
-                        db.AddBrewer(brewerName, BrewMethod.None);
+                        db.Brewers.AddBrewer(brewerName, BrewMethod.None);
                         Console.WriteLine($"\nAdded {brewerName} brewer to DB\n");
                         return;
                     }
@@ -57,7 +57,7 @@
                         continue;
                     }
                     brewMethod = (BrewMethod)num;
-                    db.AddBrewer(brewerName, brewMethod);
+                    db.Brewers.AddBrewer(brewerName, brewMethod);
                     Console.WriteLine($"\nAdded {brewerName} brewer to DB\n");
                     return;
                 }
@@ -66,7 +66,7 @@
 
         private bool IsBrewerNameTaken(string brewerName)
         {
-            return db.GetBrewerNames().Contains(brewerName);
+            return db.Brewers.GetBrewerNames().Contains(brewerName);
         }
     }
 }

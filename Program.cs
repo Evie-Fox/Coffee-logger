@@ -12,6 +12,7 @@ namespace CoffeeLogger
         private GrinderSettingManager grindSettingMan;
         private CoffeeBeansManager beanMan;
         private BrewerManager brewerMan;
+        private BrewManager brewMan;
 
         private static void Main()
         {
@@ -32,6 +33,7 @@ namespace CoffeeLogger
             grindSettingMan = new GrinderSettingManager(db, grinderMam);
             beanMan = new CoffeeBeansManager(db);
             brewerMan = new BrewerManager(db);
+            brewMan = new BrewManager(db, grinderMam, beanMan, brewerMan);
 
             ConsoleReader();
             Console.WriteLine("\n\nShutting down");
@@ -60,7 +62,7 @@ namespace CoffeeLogger
                         await grinderMam.AddNewGrinderFromConsole();
                         break;
                     case "grinders":
-                        Console.WriteLine("\n\n" + String.Join("\n", db.GetGrinderNames()) + "\n");
+                        Console.WriteLine("\n\n" + String.Join("\n", db.Grinders.GetGrinderNames()) + "\n");
                         break;
 
                     case "newgrind":
@@ -71,14 +73,14 @@ namespace CoffeeLogger
                         await brewerMan.AddNewBrewer();
                         break;
                     case "brewers":
-                        Console.WriteLine("\n\n" + String.Join("\n", db.GetBrewerNames()) + "\n");
+                        Console.WriteLine("\n\n" + String.Join("\n", db.Brewers.GetBrewerNames()) + "\n");
                         break;
 
                     case "newcoffee" or "newbeans" or "newcoffeebeans" or "addcoffee" or "addbeans":
                         await beanMan.AddNewCoffeeBeans();
                         break;
                     case "coffee" or "beans" or "coffeebeans":
-                        Console.WriteLine("\n\n" + String.Join("\n", db.GetCoffeeNames()) + "\n");
+                        Console.WriteLine("\n\n" + String.Join("\n", db.Beans.GetCoffeeNames()) + "\n");
                         break;
 
                     case "stop" or "quit":
