@@ -95,13 +95,13 @@ namespace CoffeeLogger
                 {
                     break;
                 }
-                if (!newSetting.All(x => char.IsDigit(x) || x == ','))
+                newDialSetting = new(newSetting);
+                if (!newDialSetting.isValid)
                 {
                     Console.WriteLine("\n\nInvalid format\n\nEnter dial format:\n");
                     continue;
                 }
-                newDialSetting = new(newSetting);
-
+                
                 if (!gm.IsSettingCompatible(grinderName, newDialSetting))
                 {
                     Console.WriteLine("\ndial setting is not compatible with the grinder's format\n");

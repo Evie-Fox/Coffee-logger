@@ -52,7 +52,7 @@
                         Console.WriteLine("\nGrind setting is already registered for this brew\n");
                         continue;
                     }
-                    return newGrind;
+                    return "N" + newGrind;
                 }
             }
         }

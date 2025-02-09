@@ -1,17 +1,20 @@
-﻿namespace CoffeeLogger
+﻿using System.Data.Entity.Infrastructure;
+using System.Data.SQLite;
+
+namespace CoffeeLogger
 {
     public class BrewManager
     {
-        private SQLController db;
+        private SQLController dbController;
         private GrinderManager grinderMan;
         private GrindSettingManager grindMan;
         private CoffeeBeansManager coffeeBeansMan;
         private BrewerManager brewerMan;
         private RatioManager ratioMan;
 
-        public BrewManager (SQLController db, GrinderManager grinderMan, GrindSettingManager grindMan, CoffeeBeansManager coffeeBeansMan, BrewerManager brewerMan, RatioManager ratioMan)
+        public BrewManager(SQLController db, GrinderManager grinderMan, GrindSettingManager grindMan, CoffeeBeansManager coffeeBeansMan, BrewerManager brewerMan, RatioManager ratioMan)
         {
-            this.db = db;
+            this.dbController = db;
             this.grinderMan = grinderMan;
             this.coffeeBeansMan = coffeeBeansMan;
             this.grindMan = grindMan;
@@ -31,7 +34,7 @@
                 {
                     string? coffeeBeansName = await coffeeBeansMan.ChooseOrAddCoffeeBeans();
                     if (coffeeBeansName == null)
-                        { break; }
+                    { break; }
                     while (true)
                     {
                         string? grinderName = await grinderMan.ChooseGrinder();
@@ -44,14 +47,80 @@
                             { break; }
                             while (true)
                             {
-                                string? ratio = await ratioMan.ChooseOrAddRatio(grinderName,coffeeBeansName, brewerName, grindSetting);
-                                if (ratio == null)
+                                bool isNew = false;
+                                string? gramsPerLiter = await ratioMan.ChooseOrAddRatio(grinderName, coffeeBeansName, brewerName, grindSetting);
+                                if (gramsPerLiter == null)
                                 { break; }
-                                Console.WriteLine("\nreached end!!");
+                                if (gramsPerLiter[0] == 'N')
+                                {
+                                    isNew = true; 
+                                    gramsPerLiter = gramsPerLiter.Substring(1);
+                                    InsertBrewToDB(grinderName, coffeeBeansName, brewerName, grindSetting, gramsPerLiter);
+                                }
+                                int brewID = GetBrewID(grinderName, coffeeBeansName, brewerName, grindSetting, gramsPerLiter);
+                                Console.WriteLine($"\n\nCurrent Brew:\nCoffee beans: {coffeeBeansName}\nBrewer: {brewerName}\nGrinder: {grinderName}\nGrind setting: {grindSetting}\nGrams per liter: {gramsPerLiter}\n\n");
                                 return;
                             }
                         }
                     }
+                }
+            }
+        }
+
+        public void InsertBrewToDB(string grinderName, string coffeeBeansName, string brewerName, string grindSetting, string gramsPerLiter)
+        {
+            using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))
+            {
+                dbController.db.Open();
+
+                using (SQLiteCommand com = new SQLiteCommand(
+                    "INSERT INTO Brews (BrewerName, CoffeeBeansName, GrinderName, GrindSetting, GramsPerLiter) " +
+                    "VALUES (@brewerName, @coffeeBeansName, @grinderName, @grindSetting, @gramsPerLiter)",
+                    dbController.db))
+                {
+                    com.Parameters.AddWithValue("@grinderName", grinderName);
+                    com.Parameters.AddWithValue("@coffeeBeansName", coffeeBeansName);
+                    com.Parameters.AddWithValue("@brewerName", brewerName);
+                    com.Parameters.AddWithValue("@grindSetting", grindSetting);
+                    com.Parameters.AddWithValue("@gramsPerLiter", gramsPerLiter);
+                    com.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public int GetBrewID(string grinderName, string coffeeBeansName, string brewerName, string grindSetting, string gramsPerLiter)
+        {
+            using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))
+            {
+                dbController.db.Open();
+
+                using (SQLiteCommand com = new SQLiteCommand(
+                    "Select BrewID " +
+                    "FROM Brews " +
+                    "WHERE BrewerName = @brewerName " +
+                    "AND CoffeeBeansName = @coffeeBeansName " +
+                    "AND GrinderName = @grinderName " +
+                    "AND GrindSetting = @grindSetting " +
+                    "AND GramsPerLiter = @gramsPerLiter ",
+                    dbController.db))
+                {
+                    com.Parameters.AddWithValue("@grinderName", grinderName);
+                    com.Parameters.AddWithValue("@coffeeBeansName", coffeeBeansName);
+                    com.Parameters.AddWithValue("@brewerName", brewerName);
+                    com.Parameters.AddWithValue("@grindSetting", grindSetting);
+                    com.Parameters.AddWithValue("@gramsPerLiter", gramsPerLiter);
+                    SQLiteDataReader data = com.ExecuteReader();
+
+                    string id = "";
+                    while (data.Read())
+                    {
+                        id = data["BrewID"].ToString(); 
+                    }
+                    if (string.IsNullOrEmpty(id))
+                    {
+                        return -1;
+                    }
+                    return int.Parse(id);
                 }
             }
         }

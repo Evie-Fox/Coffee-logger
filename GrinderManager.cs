@@ -67,6 +67,10 @@ namespace CoffeeLogger
                         continue;
                     }
                     format = new GrindDial(format).GetDialFormatString();
+                    if (format == null)
+                    {
+                        continue;
+                    }
                     AddNewGrinder(name, format);
                     return name;
                 }

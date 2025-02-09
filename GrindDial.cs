@@ -4,6 +4,7 @@ namespace CoffeeLogger
 {
     public class GrindDial
     {
+        public bool isValid { get; private set; }
         private int? z, zMax;
         private int? y, yMax;
         private int? x, xMax;
@@ -16,6 +17,7 @@ namespace CoffeeLogger
             z = 0;
             x = 0;
             y = 0;
+            isValid = false;
         }
 
         public GrindDial(string maxes)
@@ -23,15 +25,18 @@ namespace CoffeeLogger
             maxes = maxes.Trim().Replace(" ", string.Empty);
             if (string.IsNullOrWhiteSpace(maxes) || 
                 !maxes.All(c => char.IsAsciiDigit(c) || c == ',') ||
+                maxes.Contains(",,") ||
                 !char.IsAsciiDigit(maxes[0]) ||
                 !char.IsAsciiDigit(maxes[maxes.Length - 1]))
             {
                 Console.WriteLine("Invalid dial format");
+                isValid = false;
                 return;
             }
 
             int[] maxVals = Array.ConvertAll(maxes.Split(','), int.Parse);
             int length = maxVals.Length - 1;
+            isValid = true;
 
             if (length > 2)
             {
@@ -82,8 +87,10 @@ namespace CoffeeLogger
             return x;
         }
     */
-        public string GetDialFormatString()
+        public string? GetDialFormatString()
         {
+            if (isValid == false)
+            { return null; }
             int?[] all = { zMax, yMax, xMax };
             all = all.Where(x => x != null).ToArray();
             return string.Join(",", all);
@@ -91,6 +98,8 @@ namespace CoffeeLogger
         
         public int?[] GetDialFormatIntArr()
         {
+            if (isValid == false)
+            { return null; }
             int?[] val = {zMax, yMax, xMax};
             return val.Where(x => x != null).ToArray();
         }
