@@ -4,7 +4,7 @@ namespace CoffeeLogger
 {
     public class GrindDial
     {
-        private int? z, zMax = null;
+        private int? z, zMax;
         private int? y, yMax;
         private int? x, xMax;
 
@@ -21,10 +21,15 @@ namespace CoffeeLogger
         public GrindDial(string maxes)
         {
             maxes = maxes.Trim().Replace(" ", string.Empty);
-            if (string.IsNullOrWhiteSpace(maxes) || !maxes.All(c => char.IsAsciiDigit(c) || c == ','))
+            if (string.IsNullOrWhiteSpace(maxes) || 
+                !maxes.All(c => char.IsAsciiDigit(c) || c == ',') ||
+                !char.IsAsciiDigit(maxes[0]) ||
+                !char.IsAsciiDigit(maxes[maxes.Length - 1]))
             {
-                throw new ArgumentException("Invalid dial format");
+                Console.WriteLine("Invalid dial format");
+                return;
             }
+
             int[] maxVals = Array.ConvertAll(maxes.Split(','), int.Parse);
             int length = maxVals.Length - 1;
 
@@ -40,58 +45,43 @@ namespace CoffeeLogger
             zMax = maxVals[length];
             return;
         }
-/*
+    /*
         public int ZUp()
         {
-            z++;
-            if (z > zMax)
-            { z = 0; }
+            if (++z > zMax) { z = 0; }
             return z;
         }
 
         public int ZDown()
         {
-            if (z == 0)
-            { z = zMax; }
-            else
-            { z--; }
+            if (--z < 0) { z = zMax; }
             return z;
         }
 
         public int yUp()
         {
-            y++;
-            if (y > yMax)
-            { y = 0; }
+            if (++y > yMax) { y = 0; }
             return y;
         }
 
         public int YDown()
         {
-            if (y == 0)
-            { y = yMax; }
-            else
-            { y--; }
+            if (--y < 0) { y = yMax; }
             return y;
         }
 
         public int XUp()
         {
-            x++;
-            if (x > xMax)
-            { x = 0; }
+            if (++x > xMax) { x = 0; }
             return x;
         }
 
         public int XDown()
         {
-            if (x == 0)
-            { x = xMax; }
-            else
-            { x--; }
+            if (--x < 0) { x = xMax; } 
             return x;
-        }*/
-
+        }
+    */
         public string GetDialFormatString()
         {
             int?[] all = { zMax, yMax, xMax };

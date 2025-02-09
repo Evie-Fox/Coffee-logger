@@ -11,21 +11,6 @@ namespace CoffeeLogger
             this.dbController = dbController;
         }
 
-        public void AddGrindSetting(string grinderName, string grindSetting)
-        {
-            using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))
-            {
-                dbController.db.Open();
-
-                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO GrindSettings (GrinderName, GrindSetting) VALUES (@name, @setting)", dbController.db))
-                {
-                    com.Parameters.AddWithValue("@name", grinderName);
-                    com.Parameters.AddWithValue("@setting", grindSetting);
-                    com.ExecuteNonQuery();
-                }
-            }
-        }
-
         public bool IsGrindSettingTaken(string grinderName, string grindSetting)
         {
             using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))

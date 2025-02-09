@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace CoffeeLogger
+﻿namespace CoffeeLogger
 {
     public class BrewManager
     {
@@ -9,14 +7,16 @@ namespace CoffeeLogger
         private GrindSettingManager grindMan;
         private CoffeeBeansManager coffeeBeansMan;
         private BrewerManager brewerMan;
+        private RatioManager ratioMan;
 
-        public BrewManager(SQLController db, GrinderManager grinderMan, GrindSettingManager grindMan, CoffeeBeansManager coffeeBeansMan, BrewerManager brewerMan)
+        public BrewManager (SQLController db, GrinderManager grinderMan, GrindSettingManager grindMan, CoffeeBeansManager coffeeBeansMan, BrewerManager brewerMan, RatioManager ratioMan)
         {
             this.db = db;
             this.grinderMan = grinderMan;
             this.coffeeBeansMan = coffeeBeansMan;
             this.grindMan = grindMan;
             this.brewerMan = brewerMan;
+            this.ratioMan = ratioMan;
         }
 
         public async Task NewBrew()
@@ -37,7 +37,6 @@ namespace CoffeeLogger
                         string? grinderName = await grinderMan.ChooseGrinder();
                         if (grinderName == null)
                         { break; }
-                        Console.WriteLine("!!");
                         while (true)
                         {
                             string? grindSetting = await grindMan.ChooseOrAddGrindSetting(grinderName, coffeeBeansName, brewerName);
@@ -45,7 +44,10 @@ namespace CoffeeLogger
                             { break; }
                             while (true)
                             {
-                                Console.WriteLine("reached end!!");
+                                string? ratio = await ratioMan.ChooseOrAddRatio(grinderName,coffeeBeansName, brewerName, grindSetting);
+                                if (ratio == null)
+                                { break; }
+                                Console.WriteLine("\nreached end!!");
                                 return;
                             }
                         }

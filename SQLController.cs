@@ -8,6 +8,7 @@ namespace CoffeeLogger
         public GrindSettingDB GrindSettings;
         public BrewerDB Brewers;
         public BeanDB Beans;
+        public RatioDB Ratio;
 
         private string _pathToDir = @"..\..\..\DB\";
         public string _pathToFile { get; private set; } = @"..\..\..\DB\MainDB.db";
@@ -20,6 +21,7 @@ namespace CoffeeLogger
             GrindSettings = new GrindSettingDB(this);
             Brewers = new BrewerDB(this);
             Beans = new BeanDB(this);
+            Ratio = new RatioDB(this);
         }
 
         public void Activate()
@@ -94,16 +96,6 @@ namespace CoffeeLogger
 
                 GrinderTable.ExecuteNonQuery();
 
-                SQLiteCommand GrindSettingsTable = new SQLiteCommand(@"
-            CREATE TABLE GrindSettings(
-            GrinderName VARCHAR(255) NOT NULL,
-            GrindSetting VARCHAR(255) NOT NULL,
-            PRIMARY KEY (GrinderName, GrindSetting)
-            FOREIGN KEY (GrinderName) REFERENCES Grinders(Name) ON DELETE CASCADE
-            )", db);
-
-                GrindSettingsTable.ExecuteNonQuery();
-
                 SQLiteCommand BrewsTable = new SQLiteCommand(@"
             CREATE TABLE Brews(
             BrewID INTEGER PRIMARY KEY,
@@ -112,10 +104,10 @@ namespace CoffeeLogger
             GrindSetting VARCHAR(255) NOT NULL,
             GrinderName VARCHAR(255) NOT NULL,
             GramsPerLiter INT NOT NULL,
-            UNIQUE (CoffeeBeansName, BrewerName, GrinderName, GrindSetting),
+            UNIQUE (CoffeeBeansName, BrewerName, GrinderName, GrindSetting, GramsPerLiter),
             FOREIGN KEY (CoffeeBeansName) REFERENCES CoffeeBeans(Name),
             FOREIGN KEY (BrewerName) REFERENCES Brewers(Name),
-            FOREIGN KEY (GrinderName,GrindSetting) REFERENCES GrindSettings(GrinderName, GrindSetting)
+            FOREIGN KEY (GrinderName) REFERENCES Grinders(Name) ON DELETE CASCADE
             )", db);
 
                 BrewsTable.ExecuteNonQuery();
@@ -154,18 +146,18 @@ namespace CoffeeLogger
             }
         }
 
-        public bool IsBrewTaken(int CoffeeBeanID, int BrewerID, string GrinderName, string GrindSetting)
+        public bool IsBrewTaken(string coffeeBeansName, string brewerName, string grinderName, string grindSetting)
         {
             using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
             {
                 db.Open();
 
-                using (SQLiteCommand com = new SQLiteCommand("SELECT COUNT(*) FROM Brews WHERE @beanID = CoffeeBeanID AND @brewerID = BrewerID AND @grinderName = GrinderName AND @grindSetting = GrindSetting"))
+                using (SQLiteCommand com = new SQLiteCommand(@"SELECT COUNT(*) FROM Brews WHERE @bean = CoffeeBeansName AND @brewer = BrewerName AND @grinder = GrinderName AND @grindSetting = GrindSetting", db))
                 {
-                    com.Parameters.AddWithValue("@beanID", CoffeeBeanID);
-                    com.Parameters.AddWithValue("@brewerID", BrewerID);
-                    com.Parameters.AddWithValue("@grinderName", GrinderName);
-                    com.Parameters.AddWithValue("@grindSetting", GrindSetting);
+                    com.Parameters.AddWithValue("@bean", coffeeBeansName);
+                    com.Parameters.AddWithValue("@brewer", brewerName);
+                    com.Parameters.AddWithValue("@grinder", grinderName);
+                    com.Parameters.AddWithValue("@grindSetting", grindSetting);
                     long count = (long)com.ExecuteScalar();
                     return count > 0;
                 }

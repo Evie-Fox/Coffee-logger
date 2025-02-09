@@ -13,6 +13,7 @@ namespace CoffeeLogger
         private CoffeeBeansManager beanMan;
         private BrewerManager brewerMan;
         private BrewManager brewMan;
+        private RatioManager ratioMan;
 
         private static void Main()
         {
@@ -33,7 +34,8 @@ namespace CoffeeLogger
             grindSettingMan = new GrindSettingManager(db, grinderMam);
             beanMan = new CoffeeBeansManager(db);
             brewerMan = new BrewerManager(db);
-            brewMan = new BrewManager(db,grinderMam, grindSettingMan, beanMan, brewerMan);
+            ratioMan = new RatioManager(db);
+            brewMan = new BrewManager(db,grinderMam, grindSettingMan, beanMan, brewerMan, ratioMan);
 
             ConsoleReader();
             Console.WriteLine("\n\nShutting down");
@@ -57,20 +59,13 @@ namespace CoffeeLogger
                     case "cleardb":
                         ClearDB(); 
                         break;
+
                     case "brew" or "newbrew":
                         await brewMan.NewBrew();
                         break;
 
-
                     case "newgrinder" or "addgrinder":
                         await grinderMam.AddNewGrinderFromConsole();
-                        break;
-                    case "grinders":
-                        Console.WriteLine("\n\n" + String.Join("\n", db.Grinders.GetGrinderNames()) + "\n");
-                        break;
-
-                    case "newgrind":
-                        await grindSettingMan.AddNewGrindSetting();
                         break;
 
                     case "newbrewer" or "addbrewer":
@@ -91,7 +86,6 @@ namespace CoffeeLogger
                         return;
 
                     default:
-                    case null or "":
                         Console.WriteLine("\nInvalid command");
                         break;
                 }
@@ -118,7 +112,7 @@ namespace CoffeeLogger
 
                     if (rawKey == ConsoleKey.Escape)
                     {
-                        Console.Write("\bCanceled\n");
+                        Console.Write("\bCanceled\n\n");
                         return null;
                     }
                     if (rawKey == ConsoleKey.Enter)
@@ -136,8 +130,6 @@ namespace CoffeeLogger
                         input.Append(keyChar);
                         Console.Write(keyChar);
                     }
-
-                    
                 }
             }
         }
