@@ -4,7 +4,7 @@ namespace CoffeeLogger
 {
     public class BeanDB
     {
-        private SQLController dbController;
+        private readonly SQLController dbController;
 
         public BeanDB(SQLController dbController)
         {

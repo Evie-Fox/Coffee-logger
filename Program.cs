@@ -14,6 +14,7 @@ namespace CoffeeLogger
         private BrewerManager brewerMan;
         private BrewManager brewMan;
         private RatioManager ratioMan;
+        private LogManager logMan;
 
         private static void Main()
         {
@@ -29,13 +30,13 @@ namespace CoffeeLogger
         {
             db = new SQLController();
             db.Activate();
-
             grinderMam = new GrinderManager(db);
             grindSettingMan = new GrindSettingManager(db, grinderMam);
             beanMan = new CoffeeBeansManager(db);
             brewerMan = new BrewerManager(db);
             ratioMan = new RatioManager(db);
-            brewMan = new BrewManager(db,grinderMam, grindSettingMan, beanMan, brewerMan, ratioMan);
+            logMan = new LogManager(db);
+            brewMan = new BrewManager(db,grinderMam, grindSettingMan, beanMan, brewerMan, ratioMan, logMan);
 
             ConsoleReader();
             Console.WriteLine("\n\nShutting down");

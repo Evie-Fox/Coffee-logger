@@ -2,7 +2,7 @@
 {
     public class CoffeeBeansManager
     {
-        private SQLController db;
+        private readonly SQLController db;
 
         public CoffeeBeansManager(SQLController db)
         {

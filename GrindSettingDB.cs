@@ -4,7 +4,7 @@ namespace CoffeeLogger
 {
     public class GrindSettingDB
     {
-        private SQLController dbController;
+        private readonly SQLController dbController;
 
         public GrindSettingDB(SQLController dbController)
         {

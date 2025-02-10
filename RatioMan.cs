@@ -2,7 +2,7 @@
 {
     public class RatioManager
     {
-        private SQLController db;
+        private readonly SQLController db;
 
         public RatioManager(SQLController db)
         {
@@ -44,7 +44,7 @@
                 }
                 while (true)
                 {
-                    string? newGrind = await AddNewRatio(registeredRatios);
+                    string? newGrind = await AddNewRatioFromConsole(registeredRatios);
                     if (newGrind == null)
                     { break; }
                     if (db.IsBrewTaken(beansName, brewerName, grinderName, newGrind))
@@ -57,7 +57,7 @@
             }
         }
 
-        public async Task<string?> AddNewRatio(string[] registeredRatios)
+        public async Task<string?> AddNewRatioFromConsole(string[] registeredRatios)
         {
             while (true)
             {

@@ -1,18 +1,16 @@
-﻿using System.Data.Entity.Infrastructure;
-using System.Data.SQLite;
-
-namespace CoffeeLogger
+﻿namespace CoffeeLogger
 {
     public class BrewManager
     {
-        private SQLController dbController;
-        private GrinderManager grinderMan;
-        private GrindSettingManager grindMan;
-        private CoffeeBeansManager coffeeBeansMan;
-        private BrewerManager brewerMan;
-        private RatioManager ratioMan;
+        private readonly SQLController dbController;
+        private readonly GrinderManager grinderMan;
+        private readonly GrindSettingManager grindMan;
+        private readonly CoffeeBeansManager coffeeBeansMan;
+        private readonly BrewerManager brewerMan;
+        private readonly RatioManager ratioMan;
+        private readonly LogManager logMan;
 
-        public BrewManager(SQLController db, GrinderManager grinderMan, GrindSettingManager grindMan, CoffeeBeansManager coffeeBeansMan, BrewerManager brewerMan, RatioManager ratioMan)
+        public BrewManager(SQLController db, GrinderManager grinderMan, GrindSettingManager grindMan, CoffeeBeansManager coffeeBeansMan, BrewerManager brewerMan, RatioManager ratioMan, LogManager logMan)
         {
             this.dbController = db;
             this.grinderMan = grinderMan;
@@ -20,6 +18,7 @@ namespace CoffeeLogger
             this.grindMan = grindMan;
             this.brewerMan = brewerMan;
             this.ratioMan = ratioMan;
+            this.logMan = logMan;
         }
 
         public async Task NewBrew()
@@ -53,7 +52,7 @@ namespace CoffeeLogger
                                 { break; }
                                 if (gramsPerLiter[0] == 'N')
                                 {
-                                    isNew = true; 
+                                    isNew = true;
                                     gramsPerLiter = gramsPerLiter.Substring(1);
                                     dbController.Brew.InsertBrewToDB(grinderName, coffeeBeansName, brewerName, grindSetting, gramsPerLiter);
                                 }
@@ -62,12 +61,13 @@ namespace CoffeeLogger
                                 Console.WriteLine($"\n\nCurrent Brew:\nCoffee beans: {coffeeBeansName}\nBrewer: {brewerName}\nGrinder: {grinderName}\nGrind setting: {grindSetting}\nGrams per liter: {gramsPerLiter}\n\n");
                                 Console.WriteLine("\n\nAdd a log for the brew?  Y/N\n\n");
                                 string? res = await Program.ReadWithEsc();
-                                if (!string.IsNullOrEmpty(res)) 
+                                if (!string.IsNullOrEmpty(res))
                                 {
                                     res = res.ToLower().Replace(" ", "");
                                     if (res == "y" || res == "yes")
                                     {
                                         //LOG
+                                        await logMan.AddNewLogFromConsole(brewID);
                                     }
                                 }
                                 return;

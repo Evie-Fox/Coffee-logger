@@ -10,10 +10,11 @@ namespace CoffeeLogger
         public BeanDB Beans { get; private set; }
         public RatioDB Ratio { get; private set; }
         public BrewDB Brew { get; private set; }
+        public SQLiteConnection db;
+
+        public string _pathToFile { get; private set; } = @"..\..\..\DB\MainDB.db";
 
         private string _pathToDir = @"..\..\..\DB\";
-        public string _pathToFile { get; private set; } = @"..\..\..\DB\MainDB.db";
-        public SQLiteConnection db;
 
         public SQLController()
 
@@ -118,6 +119,7 @@ namespace CoffeeLogger
             CREATE TABLE ResultsLog(
             BrewID INT PRIMARY KEY,
             ExtractionMeter INT NOT NULL,
+            Score INT NOT NULL,
             Temperature INT NOT NULL,
             TastingNotes VARCHAR(255) DEFAULT NULL,
             Date Int NOT NULL,

@@ -4,7 +4,7 @@ namespace CoffeeLogger
 {
     public class RatioDB
     {
-        private SQLController dbController;
+        private readonly SQLController dbController;
         public RatioDB(SQLController db)
         {
             this.dbController = db;

@@ -4,7 +4,7 @@ namespace CoffeeLogger
 {
     public class BrewerDB
     {
-        private SQLController dbController;
+        private readonly SQLController dbController;
 
         public BrewerDB(SQLController dbController)
         {

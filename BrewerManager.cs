@@ -2,7 +2,7 @@
 {
     public class BrewerManager
     {
-        private SQLController db;
+        private readonly SQLController db;
 
         public BrewerManager(SQLController dbRef)
         {
