@@ -4,11 +4,12 @@ namespace CoffeeLogger
 {
     public class SQLController
     {
-        public GrinderDB Grinders;
-        public GrindSettingDB GrindSettings;
-        public BrewerDB Brewers;
-        public BeanDB Beans;
-        public RatioDB Ratio;
+        public GrinderDB Grinders { get; private set; }
+        public GrindSettingDB GrindSettings { get; private set; }
+        public BrewerDB Brewers { get; private set; }
+        public BeanDB Beans { get; private set; }
+        public RatioDB Ratio { get; private set; }
+        public BrewDB Brew { get; private set; }
 
         private string _pathToDir = @"..\..\..\DB\";
         public string _pathToFile { get; private set; } = @"..\..\..\DB\MainDB.db";
@@ -22,6 +23,7 @@ namespace CoffeeLogger
             Brewers = new BrewerDB(this);
             Beans = new BeanDB(this);
             Ratio = new RatioDB(this);
+            Brew = new BrewDB(this);
         }
 
         public void Activate()
