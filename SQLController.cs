@@ -10,6 +10,7 @@ namespace CoffeeLogger
         public BeanDB Beans { get; private set; }
         public RatioDB Ratio { get; private set; }
         public BrewDB Brew { get; private set; }
+        public LogDB Log { get; private set; }
         public SQLiteConnection db;
 
         public string _pathToFile { get; private set; } = @"..\..\..\DB\MainDB.db";
@@ -25,6 +26,7 @@ namespace CoffeeLogger
             Beans = new BeanDB(this);
             Ratio = new RatioDB(this);
             Brew = new BrewDB(this);
+            Log = new LogDB(this);
         }
 
         public void Activate()
@@ -117,12 +119,13 @@ namespace CoffeeLogger
 
                 SQLiteCommand LogsTable = new SQLiteCommand(@"
             CREATE TABLE ResultsLog(
-            BrewID INT PRIMARY KEY,
+            LogID INTEGER PRIMARY KEY,
+            BrewID INT NOT NULL,
             ExtractionMeter INT NOT NULL,
             Score INT NOT NULL,
             Temperature INT NOT NULL,
-            TastingNotes VARCHAR(255) DEFAULT NULL,
-            Date Int NOT NULL,
+            Note VARCHAR(255) DEFAULT NULL,
+            Date BIGINT NOT NULL,
             FOREIGN KEY (BrewID) REFERENCES Brews(BrewID)
             )", db);
 

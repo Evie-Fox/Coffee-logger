@@ -1,4 +1,6 @@
-﻿namespace CoffeeLogger
+﻿using System.Data.SQLite;
+
+namespace CoffeeLogger
 {
     public class LogManager
     {
@@ -9,7 +11,7 @@
             this.dbController = dbController;
         }
 
-        public async Task<string?> AddNewLogFromConsole(int brewID)
+        public async Task AddNewLogFromConsole(int brewID)
         {
             string? val;
             string notes;
@@ -20,7 +22,7 @@
                 val = await Program.ReadWithEsc();
                 if (string.IsNullOrWhiteSpace(val))
                 {
-                    return null;
+                    return;
                 }
                 if (!val.All(char.IsAsciiDigit))
                 {
@@ -36,7 +38,19 @@
                 Console.WriteLine("\nExtraction meter explanation:\n\n" +
                 "      -5    -4    -3    -2    -1    0    +1    +2    +3    +4    +5 \n" +
                 "     [Sour ---------------------- Ideal ---------------------- Bitter] \n");
-                Console.WriteLine("\nEnter extraction meter: (whole numbers)\n\n");
+                int? logId = dbController.Log.GetExistingLogID(brewID, temperature);
+                if (logId != null)
+                {
+                    Console.WriteLine("\nA log with identical parameters already exist, would you like to delete it? (Y/N)\n\n");
+                    val = await Program.ReadWithEsc();
+                    if (string.IsNullOrEmpty(val)) 
+                    { continue; }
+                    val = val.Trim().ToLower();
+                    if (val != "yes" || val != "y")
+                    { continue; }
+                    dbController.Log.DeleteLog((int)logId);
+                }
+                Console.WriteLine("\n\nEnter extraction meter: (whole numbers)\n\n");
                 while (true)
                 {
 
@@ -90,8 +104,10 @@
                                 continue; //TODO chack if this writes the text 
                             }
                             notes = val.Trim();
+                            dbController.Log.AddLog(brewID, temperature, extractionMeter, score, notes);
 
-                            //INSERT Log
+                            Console.WriteLine("\n\nLogged brew.\n\n");
+                            return;
                         }
 
                     }
