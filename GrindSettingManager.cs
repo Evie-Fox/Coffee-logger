@@ -65,11 +65,12 @@ namespace CoffeeLogger
                         string? newGrind = await AddNewGrindSetting(grinderName);
                         if (newGrind == null)
                         { break; }
+                        /*TODO: replace this (didn't choose temperature by now)
                         if (db.IsBrewTaken(beansName, brewerName, grinderName, newGrind))
                         {
                             Console.WriteLine("\nGrind setting is already registered for this brew\n");
                             continue;
-                        }
+                        }*/
                         return newGrind;
                     }
                 }

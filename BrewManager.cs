@@ -58,19 +58,43 @@
                                 }
                                 int brewID = dbController.Brew.GetBrewID(grinderName, coffeeBeansName, brewerName, grindSetting, gramsPerLiter);
 
-                                Console.WriteLine($"\n\nCurrent Brew:\nCoffee beans: {coffeeBeansName}\nBrewer: {brewerName}\nGrinder: {grinderName}\nGrind setting: {grindSetting}\nGrams per liter: {gramsPerLiter}\n\n");
-                                Console.WriteLine("\n\nAdd a log for the brew?  Y/N\n\n");
-                                string? res = await Program.ReadWithEsc();
-                                if (!string.IsNullOrEmpty(res))
+                                while (true)
                                 {
-                                    res = res.ToLower().Replace(" ", "");
-                                    if (res == "y" || res == "yes")
+                                    int temperature;
+                                    Console.Write("\n\nEnter brew temperature: (0c-100c, whole numbers)\n\n>");
+                                    string val = await Program.ReadWithEsc();
+                                    if (string.IsNullOrWhiteSpace(val))
                                     {
-                                        //LOG
-                                        await logMan.AddNewLogFromConsole(brewID);
+                                        break;
                                     }
+                                    if (!val.All(char.IsAsciiDigit))
+                                    {
+                                        Console.WriteLine("Invalid format, use only whole numbers\n\n");
+                                        continue;
+                                    }
+                                    temperature = int.Parse(val);
+                                    if (temperature > 100 || temperature < 0)
+                                    {
+                                        Console.WriteLine("\nNot a Outside liquid range\n");
+                                        continue;
+                                    }
+                                    Console.WriteLine($"\n\nCurrent Brew:\nCoffee beans: {coffeeBeansName}\nBrewer: {brewerName}\nGrinder: {grinderName}\nGrind setting: {grindSetting}\nGrams per liter: {gramsPerLiter}\nTemperature: {temperature}\n\n");
+                                    if (dbController.IsBrewTaken(coffeeBeansName, brewerName, grinderName, grinderName, temperature))
+                                    {
+                                        Console.WriteLine("\nBrew is already registered, a new log will override an existing one\n");
+                                    }
+                                    Console.WriteLine("\n\nAdd a log for the brew?  Y/N\n\n");
+                                    string? res = await Program.ReadWithEsc();
+                                    if (!string.IsNullOrEmpty(res))
+                                    {
+                                        res = res.ToLower().Replace(" ", "");
+                                        if (res == "y" || res == "yes")
+                                        {
+                                            await logMan.AddNewLogFromConsole(brewID);
+                                        }
+                                    }
+                                    return;
                                 }
-                                return;
                             }
                         }
                     }

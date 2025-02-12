@@ -16,44 +16,27 @@ namespace CoffeeLogger
             string? val;
             string notes;
             int extractionMeter, score, temperature;
+
             while (true)
             {
-                Console.Write("\n\nEnter brew temperature: (0c-100c, whole numbers)\n\n>");
-                val = await Program.ReadWithEsc();
-                if (string.IsNullOrWhiteSpace(val))
-                {
-                    return;
-                }
-                if (!val.All(char.IsAsciiDigit))
-                {
-                    Console.WriteLine("Invalid format, use only whole numbers\n\n");
-                    continue;
-                }
-                temperature = int.Parse(val);
-                if (temperature > 100 || temperature < 0)
-                {
-                    Console.WriteLine("\nNot a realistic temperature\n");
-                    continue;
-                }
                 Console.WriteLine("\nExtraction meter explanation:\n\n" +
                 "      -5    -4    -3    -2    -1    0    +1    +2    +3    +4    +5 \n" +
                 "     [Sour ---------------------- Ideal ---------------------- Bitter] \n");
-                int? logId = dbController.Log.GetExistingLogID(brewID, temperature);
+                int? logId = dbController.Log.GetExistingLogID(brewID);
                 if (logId != null)
                 {
                     Console.WriteLine("\nA log with identical parameters already exist, would you like to delete it? (Y/N)\n\n");
                     val = await Program.ReadWithEsc();
-                    if (string.IsNullOrEmpty(val)) 
-                    { continue; }
+                    if (string.IsNullOrEmpty(val))
+                    { return; }
                     val = val.Trim().ToLower();
                     if (val != "yes" || val != "y")
-                    { continue; }
+                    { return; }
                     dbController.Log.DeleteLog((int)logId);
                 }
                 Console.WriteLine("\n\nEnter extraction meter: (whole numbers)\n\n");
                 while (true)
                 {
-
                     val = await Program.ReadWithEsc();
                     if (string.IsNullOrWhiteSpace(val))
                     {
@@ -101,15 +84,14 @@ namespace CoffeeLogger
                             {
                                 Console.WriteLine("\n\nNotes are too long, please cut it down.\n");
                                 Console.Write("\n" + val);
-                                continue; //TODO chack if this writes the text 
+                                continue; //TODO chack if this writes the text
                             }
                             notes = val.Trim();
-                            dbController.Log.AddLog(brewID, temperature, extractionMeter, score, notes);
+                            dbController.Log.AddLog(brewID, extractionMeter, score, notes);
 
                             Console.WriteLine("\n\nLogged brew.\n\n");
                             return;
                         }
-
                     }
                 }
             }

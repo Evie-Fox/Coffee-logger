@@ -44,15 +44,11 @@
                 }
                 while (true)
                 {
-                    string? newGrind = await AddNewRatioFromConsole(registeredRatios);
-                    if (newGrind == null)
+                    string? newRatio = await AddNewRatioFromConsole(registeredRatios);
+                    if (newRatio == null)
                     { break; }
-                    if (db.IsBrewTaken(beansName, brewerName, grinderName, newGrind))
-                    {
-                        Console.WriteLine("\nGrind setting is already registered for this brew\n");
-                        continue;
-                    }
-                    return "N" + newGrind;
+
+                    return "N" + newRatio;
                 }
             }
         }

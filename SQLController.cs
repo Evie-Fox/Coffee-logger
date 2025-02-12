@@ -109,7 +109,8 @@ namespace CoffeeLogger
             GrindSetting VARCHAR(255) NOT NULL,
             GrinderName VARCHAR(255) NOT NULL,
             GramsPerLiter INT NOT NULL,
-            UNIQUE (CoffeeBeansName, BrewerName, GrinderName, GrindSetting, GramsPerLiter),
+            Temperature INT NOT NULL,
+            UNIQUE (CoffeeBeansName, BrewerName, GrinderName, GrindSetting, GramsPerLiter, Temperature),
             FOREIGN KEY (CoffeeBeansName) REFERENCES CoffeeBeans(Name),
             FOREIGN KEY (BrewerName) REFERENCES Brewers(Name),
             FOREIGN KEY (GrinderName) REFERENCES Grinders(Name) ON DELETE CASCADE
@@ -123,7 +124,6 @@ namespace CoffeeLogger
             BrewID INT NOT NULL,
             ExtractionMeter INT NOT NULL,
             Score INT NOT NULL,
-            Temperature INT NOT NULL,
             Note VARCHAR(255) DEFAULT NULL,
             Date BIGINT NOT NULL,
             FOREIGN KEY (BrewID) REFERENCES Brews(BrewID)
@@ -153,18 +153,26 @@ namespace CoffeeLogger
             }
         }
 
-        public bool IsBrewTaken(string coffeeBeansName, string brewerName, string grinderName, string grindSetting)
+        public bool IsBrewTaken(string coffeeBeansName, string brewerName, string grinderName, string grindSetting, int temperature)
         {
             using (db = new SQLiteConnection($"Data Source = {_pathToFile}; Version = 3;"))
             {
                 db.Open();
 
-                using (SQLiteCommand com = new SQLiteCommand(@"SELECT COUNT(*) FROM Brews WHERE @bean = CoffeeBeansName AND @brewer = BrewerName AND @grinder = GrinderName AND @grindSetting = GrindSetting", db))
+                using (SQLiteCommand com = new SQLiteCommand(@"
+                SELECT COUNT(*) 
+                FROM Brews 
+                WHERE CoffeeBeansName = @bean 
+                AND BrewerName = @brewer 
+                AND GrinderName = @grinder 
+                AND GrindSetting = @grindSetting 
+                AND Temperature = @temperature", db))
                 {
                     com.Parameters.AddWithValue("@bean", coffeeBeansName);
                     com.Parameters.AddWithValue("@brewer", brewerName);
                     com.Parameters.AddWithValue("@grinder", grinderName);
                     com.Parameters.AddWithValue("@grindSetting", grindSetting);
+                    com.Parameters.AddWithValue("@temperature", temperature);
                     long count = (long)com.ExecuteScalar();
                     return count > 0;
                 }
