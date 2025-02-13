@@ -34,7 +34,7 @@ namespace CoffeeLogger
                 dbController.db.Open();
                 SQLiteCommand com = new SQLiteCommand(@$"
                 
-                SELECT DialFormat
+                SELECT DISTINCT DialFormat
                 FROM Grinders
                 WHERE Name = @grinderName
                 

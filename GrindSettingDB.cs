@@ -18,7 +18,7 @@ namespace CoffeeLogger
                 dbController.db.Open();
 
                 long count;
-                using (SQLiteCommand com = new SQLiteCommand("Select COUNT(*) FROM GrindSettings WHERE @name = GrinderName AND @setting = GrindSetting", dbController.db))
+                using (SQLiteCommand com = new SQLiteCommand("Select COUNT(*) FROM GrindSettings WHERE @name = GrinderName AND @setting = GrindSetting", dbController.db))//TODO improve
                 {
                     com.Parameters.AddWithValue("@name", grinderName);
                     com.Parameters.AddWithValue("@setting", grindSetting);
@@ -36,7 +36,7 @@ namespace CoffeeLogger
                 dbController.db.Open();
                 List<string> settings = new();
 
-                using (SQLiteCommand com = new SQLiteCommand("SELECT GrindSetting From Brews WHERE @coffeeBeansName = CoffeeBeansName AND @brewerName = BrewerName AND @grinderName = GrinderName", dbController.db))
+                using (SQLiteCommand com = new SQLiteCommand("SELECT DISTINCT GrindSetting From Brews WHERE @coffeeBeansName = CoffeeBeansName AND @brewerName = BrewerName AND @grinderName = GrinderName", dbController.db))
                 {
                     com.Parameters.AddWithValue("@grinderName", grinderName);
                     com.Parameters.AddWithValue("@coffeeBeansName", coffeeBeansName);

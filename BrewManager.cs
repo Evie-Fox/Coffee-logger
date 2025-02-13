@@ -46,16 +46,9 @@
                             { break; }
                             while (true)
                             {
-                                bool isNew = false;
-                                string? gramsPerLiter = await ratioMan.ChooseOrAddRatio(grinderName, coffeeBeansName, brewerName, grindSetting);
+                                int? gramsPerLiter = await ratioMan.ChooseOrAddRatio(grinderName, coffeeBeansName, brewerName, grindSetting);
                                 if (gramsPerLiter == null)
                                 { break; }
-                                if (gramsPerLiter[0] == 'N')
-                                {
-                                    isNew = true;
-                                    gramsPerLiter = gramsPerLiter.Substring(1);
-                                    dbController.Brew.InsertBrewToDB(grinderName, coffeeBeansName, brewerName, grindSetting, gramsPerLiter);
-                                }
                                 int brewID = dbController.Brew.GetBrewID(grinderName, coffeeBeansName, brewerName, grindSetting, gramsPerLiter);
 
                                 while (true)
@@ -79,9 +72,13 @@
                                         continue;
                                     }
                                     Console.WriteLine($"\n\nCurrent Brew:\nCoffee beans: {coffeeBeansName}\nBrewer: {brewerName}\nGrinder: {grinderName}\nGrind setting: {grindSetting}\nGrams per liter: {gramsPerLiter}\nTemperature: {temperature}\n\n");
-                                    if (dbController.IsBrewTaken(coffeeBeansName, brewerName, grinderName, grinderName, temperature))
+                                    if (dbController.IsBrewTaken(coffeeBeansName, brewerName, grinderName, grindSetting, (int)gramsPerLiter, temperature))
                                     {
                                         Console.WriteLine("\nBrew is already registered, a new log will override an existing one\n");
+                                    }
+                                    else
+                                    {
+                                        dbController.Brew.InsertBrewToDB(grinderName, coffeeBeansName, brewerName, grindSetting, (int)gramsPerLiter, temperature);
                                     }
                                     Console.WriteLine("\n\nAdd a log for the brew?  Y/N\n\n");
                                     string? res = await Program.ReadWithEsc();

@@ -17,9 +17,9 @@ namespace CoffeeLogger
                 dbController.db.Open();
 
                 using (SQLiteCommand com = new SQLiteCommand(
-                    "SELECT GramsPerLiter " +
-                    "From Brews " +
-                    "WHERE CoffeeBeansName = @coffeeBeansName AND BrewerName = @brewerName AND GrinderName = @grinderName  AND GrindSetting = @grindSetting",
+                    @"SELECT DISTINCT GramsPerLiter 
+                      From Brews 
+                      WHERE CoffeeBeansName = @coffeeBeansName AND BrewerName = @brewerName AND GrinderName = @grinderName  AND GrindSetting = @grindSetting",
                     dbController.db))
                 {
                     

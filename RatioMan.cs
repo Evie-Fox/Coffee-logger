@@ -9,9 +9,9 @@
             this.db = db;
         }
 
-        public async Task<string?> ChooseOrAddRatio(string grinderName, string beansName, string brewerName, string grindSetting)
+        public async Task<int?> ChooseOrAddRatio(string grinderName, string beansName, string brewerName, string grindSetting)
         {
-            string[] registeredRatios = db.Ratio.GetRatiosInBrews(grinderName, beansName, brewerName, grindSetting);
+            int[] registeredRatios = db.Ratio.GetRatiosInBrews(grinderName, beansName, brewerName, grindSetting).Select(int.Parse).ToArray();
             Array.Sort(registeredRatios);
             int length = registeredRatios.Length;
 
@@ -44,16 +44,16 @@
                 }
                 while (true)
                 {
-                    string? newRatio = await AddNewRatioFromConsole(registeredRatios);
+                    int? newRatio = await AddNewRatioFromConsole(registeredRatios);
                     if (newRatio == null)
                     { break; }
 
-                    return "N" + newRatio;
+                    return newRatio;
                 }
             }
         }
 
-        public async Task<string?> AddNewRatioFromConsole(string[] registeredRatios)
+        public async Task<int?> AddNewRatioFromConsole(int[] registeredRatios)
         {
             while (true)
             {
@@ -67,11 +67,12 @@
                     Console.WriteLine("\nInvalid format, please choose one of the shown numbers\n");
                     continue;
                 }
-                if (registeredRatios.Contains(ratio))
+                int numRatio = int.Parse(ratio);
+                if (registeredRatios.Contains(numRatio))
                 {
                     Console.WriteLine("\nRatio is already registered\n");
                 }
-                return ratio;
+                return numRatio;
             }
         }
     }

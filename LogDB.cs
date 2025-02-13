@@ -18,7 +18,7 @@ namespace CoffeeLogger
                 dbController.db.Open();
 
 
-                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO ResultsLog (BrewID, ExtractionMeter, Score, Note, Date) VALUES (@brewID, @temperature, @extractionMeter, @score, @note, @date)", dbController.db))
+                using (SQLiteCommand com = new SQLiteCommand("INSERT INTO ResultsLog (BrewID, ExtractionMeter, Score, Note, Date) VALUES (@brewID, @extractionMeter, @score, @note, @date)", dbController.db))
                 {
 
                     com.Parameters.AddWithValue("@brewID", brewID);
@@ -43,7 +43,12 @@ namespace CoffeeLogger
                     WHERE BrewID = @brewID", dbController.db))
                 {
                     com.Parameters.AddWithValue("@brewID", brewID);
-                    return (int?)com.ExecuteScalar();//might cause problems`
+                    object foo = com.ExecuteScalar();
+                    if (foo != null)
+                    {
+                        return int.Parse(foo.ToString());
+                    }
+                    return null;
                 }
             }
         }

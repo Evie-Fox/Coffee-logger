@@ -11,7 +11,7 @@ namespace CoffeeLogger
             this.dbController = dbController;
         }
 
-        public int GetBrewID(string grinderName, string coffeeBeansName, string brewerName, string grindSetting, string gramsPerLiter)
+        public int GetBrewID(string grinderName, string coffeeBeansName, string brewerName, string grindSetting,int? gramsPerLiter)
         {
             using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))
             {
@@ -48,21 +48,22 @@ namespace CoffeeLogger
             }
         }
 
-        public void InsertBrewToDB(string grinderName, string coffeeBeansName, string brewerName, string grindSetting, string gramsPerLiter)
+        public void InsertBrewToDB(string grinderName, string coffeeBeansName, string brewerName, string grindSetting, int temperature, int gramsPerLiter)
         {
             using (dbController.db = new SQLiteConnection($"Data Source = {dbController._pathToFile}; Version = 3;"))
             {
                 dbController.db.Open();
 
                 using (SQLiteCommand com = new SQLiteCommand(
-                    "INSERT INTO Brews (BrewerName, CoffeeBeansName, GrinderName, GrindSetting, GramsPerLiter) " +
-                    "VALUES (@brewerName, @coffeeBeansName, @grinderName, @grindSetting, @gramsPerLiter)",
+                    @"INSERT INTO Brews (BrewerName, CoffeeBeansName, GrinderName, GrindSetting, Temperature, GramsPerLiter)
+                      VALUES (@brewerName, @coffeeBeansName, @grinderName, @grindSetting, @temperature,@gramsPerLiter)",
                     dbController.db))
                 {
                     com.Parameters.AddWithValue("@grinderName", grinderName);
                     com.Parameters.AddWithValue("@coffeeBeansName", coffeeBeansName);
                     com.Parameters.AddWithValue("@brewerName", brewerName);
                     com.Parameters.AddWithValue("@grindSetting", grindSetting);
+                    com.Parameters.AddWithValue("@temperature", temperature);
                     com.Parameters.AddWithValue("@gramsPerLiter", gramsPerLiter);
                     com.ExecuteNonQuery();
                 }

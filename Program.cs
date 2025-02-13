@@ -99,9 +99,13 @@ namespace CoffeeLogger
             db.ClearDB();
         }
 
-        public static async Task<string?> ReadWithEsc()
+        public static async Task<string?> ReadWithEsc(string existingTest = "")
         {
             StringBuilder input = new StringBuilder();
+            if (existingTest != "")
+            {
+                input.Append(existingTest);
+            }
 
             while (true)
             {
